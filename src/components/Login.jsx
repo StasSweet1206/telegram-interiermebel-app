@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import './Login.css';
 
 function Login() {
+  const [activeTab, setActiveTab] = useState('login'); 
   const [telegramUser, setTelegramUser] = useState(null);
   const [isRegistered, setIsRegistered] = useState(null); // null - проверяем, true - есть, false - нет
   const [isLoading, setIsLoading] = useState(true);
@@ -226,17 +227,16 @@ function Login() {
         {success && <div className="success-message">{success}</div>}
 
         <div className="tabs">
-          <button> 
-           className={`tab ${activeTab === 'login' ? 'active' : ''}`}
+          <button 
+            className={`tab ${activeTab === 'login' ? 'active' : ''}`}
             onClick={() => setActiveTab('login')}
-          
+            >
             Вход
           </button>
-          <button> 
+           <button 
             className={`tab ${activeTab === 'register' ? 'active' : ''}`}
             onClick={() => setActiveTab('register')}
-          
-          
+            >
             Регистрация
           </button>
         </div>
