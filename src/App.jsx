@@ -1,10 +1,11 @@
 import React from 'react';
+import './App.css';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import CheckUser from './components/auth/CheckUser';
 import Login from './components/auth/Login';
 import GuestMenu from './components/auth/GuestMenu';
 import MainMenu from './components/MainMenu';
-import './App.css';
+
 
 function App() {
   return (
