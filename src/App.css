@@ -1,17 +1,12 @@
-/* frontend/src/App.css */
-
-* {
+﻿* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 .App {
@@ -23,7 +18,6 @@ body {
   padding: 20px;
 }
 
-/* Общие стили для контейнеров */
 .container {
   width: 100%;
   max-width: 500px;
@@ -33,7 +27,6 @@ body {
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
 }
 
-/* Кнопки */
 button {
   width: 100%;
   padding: 15px;
@@ -50,16 +43,6 @@ button:hover {
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
-button:active {
-  transform: translateY(0);
-}
-
-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* Поля ввода */
 input {
   width: 100%;
   padding: 12px 15px;
@@ -75,7 +58,6 @@ input:focus {
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-/* Заголовки */
 h1 {
   font-size: 28px;
   color: #333;
@@ -83,48 +65,15 @@ h1 {
   text-align: center;
 }
 
-h2 {
-  font-size: 24px;
-  color: #333;
-  margin-bottom: 15px;
-}
-
-h3 {
-  font-size: 20px;
-  color: #555;
-  margin-bottom: 10px;
-}
-
-/* Текст */
-p {
-  font-size: 16px;
-  color: #666;
-  line-height: 1.6;
-}
-
-/* Ошибки */
 .error-message {
   background: #fee;
   color: #c33;
   padding: 12px;
   border-radius: 8px;
   margin: 15px 0;
-  font-size: 14px;
   text-align: center;
 }
 
-/* Успех */
-.success-message {
-  background: #efe;
-  color: #3c3;
-  padding: 12px;
-  border-radius: 8px;
-  margin: 15px 0;
-  font-size: 14px;
-  text-align: center;
-}
-
-/* Загрузка */
 .loading {
   text-align: center;
   padding: 40px;
@@ -145,7 +94,6 @@ p {
   100% { transform: rotate(360deg); }
 }
 
-/* Разделитель */
 .divider {
   text-align: center;
   margin: 20px 0;
@@ -164,40 +112,11 @@ p {
   background: #e0e0e0;
 }
 
-.divider::before {
-  left: 0;
-}
+.divider::before { left: 0; }
+.divider::after { right: 0; }
 
-.divider::after {
-  right: 0;
-}
-
-/* Адаптив для мобильных */
 @media (max-width: 480px) {
-  .App {
-    padding: 10px;
-  }
-
-  .container {
-    padding: 20px;
-    border-radius: 15px;
-  }
-
-  h1 {
-    font-size: 24px;
-  }
-
-  h2 {
-    font-size: 20px;
-  }
-
-  button {
-    padding: 12px;
-    font-size: 15px;
-  }
-
-  input {
-    padding: 10px 12px;
-    font-size: 15px;
-  }
+  .App { padding: 10px; }
+  .container { padding: 20px; }
+  h1 { font-size: 24px; }
 }
