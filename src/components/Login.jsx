@@ -20,7 +20,7 @@ function Login() {
   const [success, setSuccess] = useState('');
 
   // API URL вашего Django бэкенда
-  const API_URL = 'https://your-django-backend.com/api'; // ЗАМЕНИТЕ НА ВАШ URL
+  const API_URL = 'https://django-sso-production.up.railway.app/api';
 
   useEffect(() => {
     // Получаем данные пользователя из Telegram
