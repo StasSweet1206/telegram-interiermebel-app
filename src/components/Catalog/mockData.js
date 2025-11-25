@@ -4,21 +4,21 @@ export const mockCatalogData = {
     {
       id: 'MyagkayaMebel',
       name: 'Мягкая Мебель',
-      icon: '📱',
+      icon: '📁',
       hasSubcategories: true,
       subcategories: ['DivaniKristal', 'Domani']
     },
     {
       id: 'Detskie',
       name: 'Детские',
-      icon: '👕',
+      icon: '📁',
       hasSubcategories: true,
       subcategories: ['Interier', 'womens']
     },
     {
       id: 'MalieFormi',
       name: 'Малые Формы',
-      icon: '🍎',
+      icon: '📁',
       hasSubcategories: false,
       products: ['Pufi', 'PolkiBTS']
     }
@@ -28,6 +28,7 @@ export const mockCatalogData = {
     smartphones: {
       id: 'DivaniKristal',
       name: 'Диваны Кристалл',
+      icon: '📁',
       parentId: 'MyagkayaMebel',
       hasSubcategories: false,
       products: ['Lider', 'samsung']
@@ -35,6 +36,7 @@ export const mockCatalogData = {
     laptops: {
       id: 'Domani',
       name: 'Домани',
+      icon: '📁',
       parentId: 'MyagkayaMebel',
       hasSubcategories: false,
       products: ['macbook', 'lenovo']
@@ -42,6 +44,7 @@ export const mockCatalogData = {
     mens: {
       id: 'Pufi',
       name: 'Пуфы СтолПром',
+      icon: '📁',
       parentId: 'MalieFormi',
       hasSubcategories: false,
       products: ['tshirt', 'jeans']
@@ -49,6 +52,7 @@ export const mockCatalogData = {
     womens: {
       id: 'PolkiBTS',
       name: 'Полки БТС',
+      icon: '📁',
       parentId: 'MalieFormi',
       hasSubcategories: false,
       products: ['dress', 'skirt']
