@@ -1,0 +1,90 @@
+.orders-list {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========== ЗАГОЛОВОК СПИСКА ========== */
+.orders-list-header {
+  margin-bottom: 20px;
+}
+
+.orders-list-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--tg-theme-text-color, #000);
+  margin: 0 0 8px 0;
+}
+
+.orders-list-subtitle {
+  font-size: 14px;
+  color: var(--tg-theme-hint-color, #666);
+  margin: 0;
+}
+
+/* ========== СПИСОК ЗАКАЗОВ ========== */
+.orders-list-items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ========== ПУСТОЙ СПИСОК ========== */
+.orders-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  padding: 20px;
+}
+
+.orders-empty-icon {
+  color: var(--tg-theme-hint-color, #ccc);
+  margin-bottom: 24px;
+  animation: orderFloat 3s ease-in-out infinite;
+}
+
+@keyframes orderFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.orders-empty-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--tg-theme-text-color, #000);
+  margin: 0 0 12px 0;
+}
+
+.orders-empty-text {
+  font-size: 16px;
+  color: var(--tg-theme-hint-color, #666);
+  margin: 0;
+  max-width: 300px;
+}
+
+/* ========== АДАПТИВНОСТЬ ========== */
+@media (max-width: 480px) {
+  .orders-list-title {
+    font-size: 18px;
+  }
+
+  .orders-empty-title {
+    font-size: 20px;
+  }
+
+  .orders-empty-text {
+    font-size: 14px;
+  }
+}
