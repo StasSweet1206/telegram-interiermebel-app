@@ -1,18 +1,106 @@
-﻿body {
+﻿* {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
-
-#root {
+html, body {
+  height: 100%;
   width: 100%;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  /* Убираем отступы на мобильных */
+  overscroll-behavior: none;
+}
+
+body { 
+  margin: 0; 
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 
+    sans-serif; 
+  -webkit-font-smoothing: antialiased; 
+  -moz-osx-font-smoothing: grayscale;
+  /* Используем цвета темы Telegram */
+  background-color: var(--tg-theme-bg-color, #ffffff);
+  color: var(--tg-theme-text-color, #000000);
+  /* Запрещаем выделение текста (как в нативных приложениях) */
+  -webkit-user-select: none;
+  user-select: none;
+  /* Убираем эффекты тапа на iOS */
+  -webkit-tap-highlight-color: transparent;
+} 
+ 
+code { 
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', 
+    monospace; 
+} 
+ 
+#root { 
+  width: 100%; 
   min-height: 100vh;
+  /* Фикс для iOS Safari */
+  min-height: -webkit-fill-available;
+  position: relative;
+}
+
+.App {
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  width: 100%;
+  position: relative;
+  overflow-x: hidden;
+  background-color: var(--tg-theme-bg-color, #ffffff);
+  /* Плавная прокрутка */
+  scroll-behavior: smooth;
+}
+
+/* Фикс для iOS Safari - заполнение всего экрана */
+@supports (-webkit-touch-callout: none) {
+  .App {
+    min-height: -webkit-fill-available;
+  }
+  
+  #root {
+    min-height: -webkit-fill-available;
+  }
+}
+
+/* Стили для скроллбара (только на desktop) */
+@media (min-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: var(--tg-theme-secondary-bg-color, #f1f1f1);
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: var(--tg-theme-hint-color, #888);
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--tg-theme-link-color, #555);
+  }
+}
+
+/* Убираем стандартные отступы и границы у всех интерактивных элементов */
+button, input, textarea, select {
+  font-family: inherit;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* Фикс для input на iOS */
+input, textarea {
+  font-size: 16px; /* Предотвращает зум на фокусе в iOS */
+}
+
+/* Адаптивность для маленьких экранов */
+@media (max-width: 480px) {
+  body {
+    font-size: 14px;
+  }
 }

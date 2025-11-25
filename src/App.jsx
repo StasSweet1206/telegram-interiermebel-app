@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'; 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; 
 import MainMenu from './components/MainMenu/MainMenu'; 
-// import Catalog from './components/Catalog/Catalog'; 
+import Catalog from './components/Catalog/Catalog'; 
 // import Orders from './components/Orders/Orders'; 
 // import Cart from './components/Cart/Cart'; 
 import './App.css'; 
