@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import MainMenu from './components/MainMenu/MainMenu'; 
 import Catalog from './components/Catalog/Catalog'; 
 // import Orders from './components/Orders/Orders'; 
-// import Cart from './components/Cart/Cart'; 
+import Cart from './components/Cart/Cart'; 
 import './App.css'; 
 
 function App() { 
@@ -57,9 +57,9 @@ function App() {
         <Routes> 
           <Route path="/" element={<MainMenu />} /> 
           {/* Раскомментируйте когда создадите эти компоненты */} 
-           <Route path="/catalog" element={<Catalog />} />
+          <Route path="/catalog" element={<Catalog />} />
           {/* <Route path="/orders" element={<Orders />} /> */} 
-          {/* <Route path="/cart" element={<Cart />} /> */} 
+          <Route path="/cart" element={<Cart />} />
         </Routes> 
       </div> 
     </Router> 

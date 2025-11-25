@@ -1,0 +1,227 @@
+.order-summary {
+  background: var(--tg-theme-bg-color, #ffffff);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  bottom: 20px;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========== ПРОГРЕСС ДОСТАВКИ ========== */
+.delivery-progress-section {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(139, 195, 74, 0.1));
+  border-radius: 12px;
+}
+
+.delivery-progress-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #4caf50;
+  margin-bottom: 12px;
+}
+
+.delivery-progress-bar {
+  height: 8px;
+  background: rgba(76, 175, 80, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.delivery-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4caf50, #8bc34a);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.delivery-progress-text {
+  font-size: 12px;
+  color: var(--tg-theme-hint-color, #666);
+  margin: 0;
+  text-align: center;
+}
+
+.delivery-progress-text strong {
+  color: #4caf50;
+  font-weight: 700;
+}
+
+/* ========== БЕСПЛАТНАЯ ДОСТАВКА ========== */
+.free-delivery-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  background: linear-gradient(135deg, #4caf50, #8bc34a);
+  color: white;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+/* ========== ДЕТАЛИ ЗАКАЗА ========== */
+.order-details {
+  margin-bottom: 20px;
+}
+
+.order-details-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--tg-theme-text-color, #000);
+  margin: 0 0 16px 0;
+}
+
+.order-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+}
+
+.order-detail-row.total {
+  padding-top: 16px;
+}
+
+.order-detail-label {
+  font-size: 14px;
+  color: var(--tg-theme-hint-color, #666);
+}
+
+.order-detail-row.total .order-detail-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--tg-theme-text-color, #000);
+}
+
+.order-detail-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--tg-theme-text-color, #000);
+}
+
+.order-detail-value.free {
+  color: #4caf50;
+}
+
+.order-detail-row.total .order-detail-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--tg-theme-link-color, #4facfe);
+}
+
+.order-detail-divider {
+  height: 1px;
+  background: var(--tg-theme-hint-color, #e0e0e0);
+  margin: 8px 0;
+}
+
+/* ========== КНОПКА ОФОРМЛЕНИЯ ========== */
+.checkout-button {
+  width: 100%;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  border: none;
+  color: white;
+  padding: 18px;
+  border-radius: 16px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
+  transition: all 0.3s;
+  margin-bottom: 16px;
+}
+
+.checkout-button:hover:not(:disabled) {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(79, 172, 254, 0.5);
+}
+
+.checkout-button:active:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.checkout-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ========== ИНФОРМАЦИЯ ========== */
+.order-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.order-info-text {
+  font-size: 12px;
+  color: var(--tg-theme-hint-color, #666);
+  margin: 0;
+  text-align: center;
+}
+
+/* ========== АДАПТИВНОСТЬ ========== */
+@media (max-width: 480px) {
+  .order-summary {
+    padding: 16px;
+    bottom: 16px;
+  }
+
+  .order-details-title {
+    font-size: 16px;
+  }
+
+  .order-detail-label,
+  .order-detail-value {
+    font-size: 13px;
+  }
+
+  .order-detail-row.total .order-detail-value {
+    font-size: 20px;
+  }
+
+  .checkout-button {
+    padding: 16px;
+    font-size: 15px;
+  }
+}
+
+@media (min-width: 768px) {
+  .order-summary {
+    padding: 24px;
+  }
+
+  .checkout-button:hover:not(:disabled) {
+    transform: translateY(-6px);
+  }
+}
