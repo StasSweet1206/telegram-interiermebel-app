@@ -25,7 +25,7 @@ export const mockCatalogData = {
   ],
 
   subcategories: {
-    smartphones: {
+    DivaniKristal: {
       id: 'DivaniKristal',
       name: 'Диваны Кристалл',
       icon: '📁',
@@ -33,7 +33,7 @@ export const mockCatalogData = {
       hasSubcategories: false,
       products: ['Lider', 'samsung']
     },
-    laptops: {
+    Domani: {
       id: 'Domani',
       name: 'Домани',
       icon: '📁',
@@ -60,7 +60,7 @@ export const mockCatalogData = {
   },
 
   products: {
-    iphone: {
+    Lider: {
       id: 'Lider',
       name: 'Диван Лидер',
       categoryId: 'DivaniKristal',
