@@ -57,7 +57,7 @@ function App() {
         <Routes> 
           <Route path="/" element={<MainMenu />} /> 
           {/* Раскомментируйте когда создадите эти компоненты */} 
-          {/* <Route path="/catalog" element={<Catalog />} /> */} 
+           <Route path="/catalog" element={<Catalog />} />
           {/* <Route path="/orders" element={<Orders />} /> */} 
           {/* <Route path="/cart" element={<Cart />} /> */} 
         </Routes> 
