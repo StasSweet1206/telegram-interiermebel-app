@@ -2,54 +2,54 @@
 export const mockCatalogData = {
   categories: [
     {
-      id: 'electronics',
-      name: 'Электроника',
+      id: 'MyagkayaMebel',
+      name: 'Мягкая Мебель',
       icon: '📱',
       hasSubcategories: true,
-      subcategories: ['smartphones', 'laptops']
+      subcategories: ['DivaniKristal', 'Domani']
     },
     {
-      id: 'clothing',
-      name: 'Одежда',
+      id: 'Detskie',
+      name: 'Детские',
       icon: '👕',
       hasSubcategories: true,
-      subcategories: ['mens', 'womens']
+      subcategories: ['Interier', 'womens']
     },
     {
-      id: 'food',
-      name: 'Продукты',
+      id: 'MalieFormi',
+      name: 'Малые Формы',
       icon: '🍎',
       hasSubcategories: false,
-      products: ['apple', 'bread', 'milk']
+      products: ['Pufi', 'PolkiBTS']
     }
   ],
 
   subcategories: {
     smartphones: {
-      id: 'smartphones',
-      name: 'Смартфоны',
-      parentId: 'electronics',
+      id: 'DivaniKristal',
+      name: 'Диваны Кристалл',
+      parentId: 'MyagkayaMebel',
       hasSubcategories: false,
-      products: ['iphone', 'samsung']
+      products: ['Lider', 'samsung']
     },
     laptops: {
-      id: 'laptops',
-      name: 'Ноутбуки',
-      parentId: 'electronics',
+      id: 'Domani',
+      name: 'Домани',
+      parentId: 'MyagkayaMebel',
       hasSubcategories: false,
       products: ['macbook', 'lenovo']
     },
     mens: {
-      id: 'mens',
-      name: 'Мужская одежда',
-      parentId: 'clothing',
+      id: 'Pufi',
+      name: 'Пуфы СтолПром',
+      parentId: 'MalieFormi',
       hasSubcategories: false,
       products: ['tshirt', 'jeans']
     },
     womens: {
-      id: 'womens',
-      name: 'Женская одежда',
-      parentId: 'clothing',
+      id: 'PolkiBTS',
+      name: 'Полки БТС',
+      parentId: 'MalieFormi',
       hasSubcategories: false,
       products: ['dress', 'skirt']
     }
@@ -57,79 +57,59 @@ export const mockCatalogData = {
 
   products: {
     iphone: {
-      id: 'iphone',
-      name: 'iPhone 15 Pro',
-      categoryId: 'smartphones',
+      id: 'Lider',
+      name: 'Диван Лидер',
+      categoryId: 'DivaniKristal',
       basePrice: 89990,
-      description: 'Смартфон Apple iPhone 15 Pro',
+      description: 'Диван Лидер ОДНОТОННЫЙ',
       hasCharacteristics: true,
       characteristics: [
         {
           id: 'iphone-128',
-          name: '128GB Титановый',
-          price: 89990,
+          name: 'Савана кофе',
+          price: 32914,
           stock: 5,
-          image: 'https://via.placeholder.com/300x300?text=iPhone+128GB'
+          image: null 
         },
         {
           id: 'iphone-256',
-          name: '256GB Титановый',
-          price: 99990,
+          name: 'Савана хазл',
+          price: 32914,
           stock: 3,
-          image: 'https://via.placeholder.com/300x300?text=iPhone+256GB'
+          image: null 
         },
         {
           id: 'iphone-512',
-          name: '512GB Черный',
-          price: 119990,
+          name: 'Савана грей',
+          price: 29868,
           stock: 0,
-          image: 'https://via.placeholder.com/300x300?text=iPhone+512GB'
+          image: null 
         }
       ]
     },
     samsung: {
       id: 'samsung',
-      name: 'Samsung Galaxy S24',
-      categoryId: 'smartphones',
+      name: 'Диван Спейс 1,2',
+      categoryId: 'DivaniKristal',
       basePrice: 69990,
-      description: 'Смартфон Samsung Galaxy S24',
+      description: 'Диван Спейс 1,2',
       hasCharacteristics: true,
       characteristics: [
         {
           id: 'samsung-128',
-          name: '128GB Фиолетовый',
+          name: 'Vivaldi 4',
           price: 69990,
           stock: 8,
-          image: 'https://via.placeholder.com/300x300?text=Samsung+128GB'
+          image: null 
         },
         {
           id: 'samsung-256',
-          name: '256GB Черный',
+          name: 'Vivaldi 8',
           price: 79990,
           stock: 12,
-          image: 'https://via.placeholder.com/300x300?text=Samsung+256GB'
+          image: null 
         }
       ]
-    },
-    apple: {
-      id: 'apple',
-      name: 'Яблоки',
-      categoryId: 'food',
-      basePrice: 150,
-      description: 'Свежие яблоки',
-      hasCharacteristics: false,
-      stock: 100,
-      image: 'https://via.placeholder.com/300x300?text=Apples'
-    },
-    bread: {
-      id: 'bread',
-      name: 'Хлеб белый',
-      categoryId: 'food',
-      basePrice: 45,
-      description: 'Свежий белый хлеб',
-      hasCharacteristics: false,
-      stock: 50,
-      image: null // Пример без фото
     }
   }
 };
