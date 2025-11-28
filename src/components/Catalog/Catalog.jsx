@@ -24,8 +24,52 @@ const Catalog = () => {
 
   // Загрузка категорий при монтировании компонента
   useEffect(() => {
-    loadCategories();
-  }, []);
+  const loadCategories = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      console.log('🔄 Загрузка категорий...');
+      const data = await catalogAPI.getCategories();
+      
+      console.log('📦 Полученные данные:', data);
+      console.log('📊 Тип данных:', typeof data);
+      console.log('🔢 Количество категорий:', data?.results?.length || data?.length || 0);
+      
+      // Проверяем структуру данных
+      if (data && data.results) {
+        console.log('✅ Используем data.results:', data.results);
+        setCategories(data.results);
+      } else if (Array.isArray(data)) {
+        console.log('✅ Используем data напрямую:', data);
+        setCategories(data);
+      } else {
+        console.warn('⚠️ Неожиданная структура данных:', data);
+        setCategories([]);
+      }
+      
+    } catch (err) {
+      console.error('❌ Ошибка загрузки категорий:', err);
+      console.error('📝 Детали ошибки:', {
+        message: err.message,
+        response: err.response,
+        request: err.request
+      });
+      
+      setError('Не удалось загрузить категории');
+      
+      if (window.Telegram?.WebApp?.showAlert) {
+        window.Telegram.WebApp.showAlert(
+          `Ошибка загрузки категорий: ${err.message}`
+        );
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  loadCategories();
+}, []);
 
   // Загрузка категорий
   const loadCategories = async () => {
