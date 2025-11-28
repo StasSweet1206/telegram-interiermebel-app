@@ -9,13 +9,6 @@ export const mockCatalogData = {
       subcategories: ['DivaniKristal', 'Domani']
     },
     {
-      id: 'Detskie',
-      name: 'Детские',
-      icon: '📁',
-      hasSubcategories: true,
-      subcategories: ['Interier', 'womens']
-    },
-    {
       id: 'MalieFormi',
       name: 'Малые Формы',
       icon: '📁',
