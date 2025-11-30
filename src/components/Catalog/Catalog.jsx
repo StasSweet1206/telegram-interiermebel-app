@@ -22,79 +22,60 @@ const Catalog = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Загрузка категорий при монтировании компонента
   useEffect(() => {
-  const loadCategories = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      console.log('🔄 Загрузка категорий...');
-      const data = await catalogAPI.getCategories();
-      
-      console.log('📦 Полученные данные:', data);
-      console.log('📊 Тип данных:', typeof data);
-      console.log('🔢 Количество категорий:', data?.results?.length || data?.length || 0);
-      
-      // Проверяем структуру данных
-      if (data && data.results) {
-        console.log('✅ Используем data.results:', data.results);
-        setCategories(data.results);
-      } else if (Array.isArray(data)) {
-        console.log('✅ Используем data напрямую:', data);
-        setCategories(data);
-      } else {
-        console.warn('⚠️ Неожиданная структура данных:', data);
-        setCategories([]);
+    const loadCategories = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        console.log('🔄 Загрузка категорий...');
+        const response = await getCategories(1, 100);
+
+        console.log('📦 Полученные данные:', response);
+
+        // Определяем где находятся категории
+        let categories = [];
+
+        if (Array.isArray(response)) {
+          console.log('✅ Это массив, используем напрямую');
+          categories = response;
+        } else if (response.results) {
+          console.log('✅ Это объект с results');
+          categories = response.results;
+        } else if (response.data) {
+          console.log('✅ Это объект с data');
+          categories = Array.isArray(response.data) ? response.data : response.data.results;
+        }
+
+        console.log('🔢 Количество категорий:', categories.length);
+
+        // Адаптируем категории к нашему формату
+        const adaptedCategories = categories.map(adaptCategory);
+
+        setCategories(adaptedCategories);
+
+      } catch (err) {
+        console.error('❌ Ошибка загрузки категорий:', err);
+        console.error('📝 Детали ошибки:', {
+          message: err.message,
+          response: err.response,
+          request: err.request
+        });
+
+        setError('Не удалось загрузить категории');
+
+        if (window.Telegram?.WebApp?.showAlert) {
+          window.Telegram.WebApp.showAlert(
+            `Ошибка загрузки категорий: ${err.message}`
+          );
+        }
+      } finally {
+        setLoading(false);
       }
-      
-    } catch (err) {
-      console.error('❌ Ошибка загрузки категорий:', err);
-      console.error('📝 Детали ошибки:', {
-        message: err.message,
-        response: err.response,
-        request: err.request
-      });
-      
-      setError('Не удалось загрузить категории');
-      
-      if (window.Telegram?.WebApp?.showAlert) {
-        window.Telegram.WebApp.showAlert(
-          `Ошибка загрузки категорий: ${err.message}`
-        );
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  loadCategories();
-}, []);
-
-  // Загрузка категорий
-  const loadCategories = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await getCategories(1, 100);
-
-      // Адаптируем категории к нашему формату
-      const adaptedCategories = response.results.map(adaptCategory);
-
-      setCategories(adaptedCategories);
-      setLoading(false);
-    } catch (err) {
-      console.error('Ошибка загрузки категорий:', err);
-      setError('Не удалось загрузить каталог. Попробуйте позже.');
-      setLoading(false);
-
-      // Показываем ошибку пользователю
-      if (window.Telegram?.WebApp) {
-        window.Telegram.WebApp.showAlert('Ошибка загрузки каталога');
-      }
-    }
-  };
+    loadCategories();
+  }, []);
 
   // Загрузка товаров категории
   const loadCategoryProducts = async (categoryId) => {
@@ -102,16 +83,47 @@ const Catalog = () => {
       setLoading(true);
       setError(null);
 
+      console.log('🔄 Загрузка товаров категории:', categoryId);
       const response = await getCategoryProducts(categoryId, 1, 100);
 
+      console.log('📦 Полученные товары:', response);
+
+      // Определяем где находятся товары
+      let products = [];
+
+      if (Array.isArray(response)) {
+        console.log('✅ Это массив товаров');
+        products = response;
+      } else if (response.results) {
+        console.log('✅ Это объект с results');
+        products = response.results;
+      } else if (response.data) {
+        console.log('✅ Это объект с data');
+        products = Array.isArray(response.data) ? response.data : response.data.results;
+      }
+
+      console.log('🔢 Количество товаров:', products.length);
+
       // Адаптируем товары к нашему формату
-      const adaptedProducts = response.results.map(adaptProduct);
+      const adaptedProducts = products.map(adaptProduct);
 
       setCurrentProducts(adaptedProducts);
-      setLoading(false);
+
     } catch (err) {
-      console.error('Ошибка загрузки товаров:', err);
+      console.error('❌ Ошибка загрузки товаров:', err);
+      console.error('📝 Детали ошибки:', {
+        message: err.message,
+        response: err.response
+      });
+
       setError('Не удалось загрузить товары. Попробуйте позже.');
+
+      if (window.Telegram?.WebApp?.showAlert) {
+        window.Telegram.WebApp.showAlert(
+          `Ошибка загрузки товаров: ${err.message}`
+        );
+      }
+    } finally {
       setLoading(false);
     }
   };
@@ -280,7 +292,7 @@ const Catalog = () => {
 
       {/* Детальная страница товара */}
       {type === 'product' && (
-        <ProductDetail 
+        <ProductDetail
           product={data}
           onBack={handleBackFromProduct}
           onAddToCart={handleAddToCart}
@@ -299,7 +311,7 @@ const Catalog = () => {
           ) : (
             <div className="categories-grid">
               {data.map(category => (
-                <CategoryCard 
+                <CategoryCard
                   key={category.id}
                   category={category}
                   onClick={() => handleCategoryClick(category)}
@@ -325,7 +337,7 @@ const Catalog = () => {
           ) : (
             <div className="products-grid">
               {data.map(product => (
-                <ProductCard 
+                <ProductCard
                   key={product.id}
                   product={product}
                   onClick={() => handleProductClick(product)}

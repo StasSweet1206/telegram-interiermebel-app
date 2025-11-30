@@ -1,9 +1,5 @@
 import api from './api';
 
-// ============================================
-// КАТЕГОРИИ
-// ============================================
-
 /**
  * Получить список всех категорий
  */
@@ -11,7 +7,7 @@ export const getCategories = async (page = 1, pageSize = 100) => {
   const response = await api.get('/catalog/categories/', {
     params: { page, page_size: pageSize },
   });
-  return response.data;
+  return response;
 };
 
 /**
@@ -37,12 +33,8 @@ export const getCategoryProducts = async (id, page = 1, pageSize = 20) => {
   const response = await api.get(`/catalog/categories/${id}/products/`, {
     params: { page, page_size: pageSize },
   });
-  return response.data;
+  return response;
 };
-
-// ============================================
-// ТОВАРЫ
-// ============================================
 
 /**
  * Получить список товаров с фильтрами
@@ -101,10 +93,6 @@ export const getProductRecommendations = async (productId, limit = 10) => {
   });
   return response.data;
 };
-
-// ============================================
-// СТАТИСТИКА
-// ============================================
 
 /**
  * Получить статистику каталога
