@@ -21,6 +21,7 @@ const Catalog = () => {
   const [navigationPath, setNavigationPath] = useState([]);
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState(null);
   const [error, setError] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -295,47 +296,106 @@ const Catalog = () => {
 
   return (
     <div className="catalog">
-      <CatalogHeader />
+      {/* Хлебные крошки и кнопка домой */}
+      {!selectedProductId && (
+        <div className="catalog-header">
+          <Breadcrumbs path={navigationPath} onNavigate={handleNavigate} />
+          <button className="home-button" onClick={handleGoHome}>
+            🏠 Главное меню
+          </button>
+        </div>
+      )}
 
-      {loading && <div className="catalog__loading">Загрузка...</div>}
-      {error && <div className="catalog__error">{error}</div>}
+      {/* Детальная страница товара */}
+      {type === 'product' && (
+        <ProductDetail
+          product={data}
+          onBack={handleBackFromProduct}
+          onAddToCart={handleAddToCart}
+          cartItems={cart}
+        />
+      )}
 
-      {!loading && !error && (
-        <>
-          {/* Список категорий или товаров */}
-          <div className="catalog__content">
-            {activeCategory ? (
-              // Товары
-              currentProducts.map(product => (
-                <ProductCard key={product.id} product={product} />
-              ))
-            ) : (
-              // Категории
-              categories.map(category => (
-                <CategoryCard
-                  key={category.id}
-                  category={category}
-                  onClick={() => handleCategoryClick(category)}
+      {/* Список категорий */}
+      {type === 'categories' && (
+        <div className="catalog-content">
+          <h2 className="catalog-title">
+            {navigationPath.length > 0 ? navigationPath[navigationPath.length - 1].name : 'Каталог'}
+          </h2>
+          {loading ? (
+            <div className="loading">Загрузка...</div>
+          ) : (
+            <>
+              <div className="categories-grid">
+                {data.map(category => (
+                  <CategoryCard
+                    key={category.id}
+                    category={category}
+                    onClick={() => handleCategoryClick(category)}
+                  />
+                ))}
+              </div>
+
+              {/* 🆕 ДОБАВЛЕНА ПАГИНАЦИЯ ДЛЯ КАТЕГОРИЙ */}
+              {totalPages > 1 && (
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={(page) => loadCategories(page)}
                 />
-              ))
-            )}
-          </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
 
-          {/* 🆕 ПАГИНАЦИЯ */}
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={(page) => {
-              window.scrollTo({ top: 0, behavior: 'smooth' }); // Прокрутка вверх
-              if (activeCategory) {
-                loadCategoryProducts(activeCategory, page);
-              } else {
-                loadCategories(page);
-              }
-            }}
-            loading={loading}
-          />
-        </>
+      {/* Список товаров */}
+      {type === 'products' && (
+        <div className="catalog-content">
+          <h2 className="catalog-title">
+            {navigationPath.length > 0 ? navigationPath[navigationPath.length - 1].name : 'Товары'}
+          </h2>
+          {loading ? (
+            <div className="loading">Загрузка товаров...</div>
+          ) : data.length === 0 ? (
+            <div className="empty-category">
+              <p>В этой категории пока нет товаров</p>
+            </div>
+          ) : (
+            <>
+              <div className="products-grid">
+                {data.map(product => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    onClick={() => handleProductClick(product)}
+                  />
+                ))}
+              </div>
+
+              {/* 🆕 ДОБАВЛЕНА ПАГИНАЦИЯ ДЛЯ ТОВАРОВ */}
+              {totalPages > 1 && (
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={(page) => {
+                    if (activeCategory) {
+                      loadCategoryProducts(activeCategory, page);
+                    }
+                  }}
+                />
+              )}
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Индикатор корзины (плавающая кнопка) */}
+      {cart.length > 0 && !selectedProductId && (
+        <div className="cart-indicator" onClick={() => navigate('/cart')}>
+          <span className="cart-icon">🛒</span>
+          <span className="cart-count">{cart.reduce((sum, item) => sum + item.quantity, 0)}</span>
+        </div>
       )}
     </div>
   );
