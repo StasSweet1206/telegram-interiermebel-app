@@ -22,59 +22,61 @@ const Catalog = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const loadCategories = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+  // Загрузка категорий (ВЫНЕСИ ИЗ useEffect)
+  const loadCategories = async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-        console.log('🔄 Загрузка категорий...');
-        const response = await getCategories(1, 100);
+      console.log('🔄 Загрузка категорий...');
+      const response = await getCategories(1, 100);
 
-        console.log('📦 Полученные данные:', response);
+      console.log('📦 Полученные данные:', response);
 
-        // Определяем где находятся категории
-        let categories = [];
+      // Определяем где находятся категории
+      let categories = [];
 
-        if (Array.isArray(response)) {
-          console.log('✅ Это массив, используем напрямую');
-          categories = response;
-        } else if (response.results) {
-          console.log('✅ Это объект с results');
-          categories = response.results;
-        } else if (response.data) {
-          console.log('✅ Это объект с data');
-          categories = Array.isArray(response.data) ? response.data : response.data.results;
-        }
-
-        console.log('🔢 Количество категорий:', categories.length);
-
-        // Адаптируем категории к нашему формату
-        const adaptedCategories = categories.map(adaptCategory);
-
-        setCategories(adaptedCategories);
-
-      } catch (err) {
-        console.error('❌ Ошибка загрузки категорий:', err);
-        console.error('📝 Детали ошибки:', {
-          message: err.message,
-          response: err.response,
-          request: err.request
-        });
-
-        setError('Не удалось загрузить категории');
-
-        if (window.Telegram?.WebApp?.showAlert) {
-          window.Telegram.WebApp.showAlert(
-            `Ошибка загрузки категорий: ${err.message}`
-          );
-        }
-      } finally {
-        setLoading(false);
+      if (Array.isArray(response)) {
+        console.log('✅ Это массив, используем напрямую');
+        categories = response;
+      } else if (response.results) {
+        console.log('✅ Это объект с results');
+        categories = response.results;
+      } else if (response.data) {
+        console.log('✅ Это объект с data');
+        categories = Array.isArray(response.data) ? response.data : response.data.results;
       }
-    };
 
-    loadCategories();
+      console.log('🔢 Количество категорий:', categories.length);
+
+      // Адаптируем категории к нашему формату
+      const adaptedCategories = categories.map(adaptCategory);
+
+      setCategories(adaptedCategories);
+
+    } catch (err) {
+      console.error('❌ Ошибка загрузки категорий:', err);
+      console.error('📝 Детали ошибки:', {
+        message: err.message,
+        response: err.response,
+        request: err.request
+      });
+
+      setError('Не удалось загрузить категории');
+
+      if (window.Telegram?.WebApp?.showAlert) {
+        window.Telegram.WebApp.showAlert(
+          `Ошибка загрузки категорий: ${err.message}`
+        );
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Загрузка категорий при монтировании компонента
+  useEffect(() => {
+    loadCategories(); // ✅ Теперь функция определена выше
   }, []);
 
   // Загрузка товаров категории
