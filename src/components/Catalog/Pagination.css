@@ -1,0 +1,45 @@
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.pagination__button {
+    min-width: 40px;
+    height: 40px;
+    padding: 8px 12px;
+    border: 1px solid var(--tg-theme-button-color, #3390ec);
+    background: var(--tg-theme-bg-color, #ffffff);
+    color: var(--tg-theme-text-color, #000000);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.pagination__button:hover:not(:disabled) {
+    background: var(--tg-theme-button-color, #3390ec);
+    color: var(--tg-theme-button-text-color, #ffffff);
+    transform: translateY(-2px);
+}
+
+.pagination__button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination__button--active {
+    background: var(--tg-theme-button-color, #3390ec);
+    color: var(--tg-theme-button-text-color, #ffffff);
+    font-weight: 600;
+}
+
+.pagination__ellipsis {
+    padding: 8px;
+    color: var(--tg-theme-hint-color, #999999);
+    user-select: none;
+}

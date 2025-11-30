@@ -7,6 +7,7 @@ import ProductDetail from './ProductDetail';
 import { getCategories, getCategoryProducts, getProduct } from '../../services/catalog';
 import { adaptCategory, adaptProduct } from '../../services/catalogAdapter';
 import './Catalog.css';
+import Pagination from './Pagination';
 
 const Catalog = () => {
   const navigate = useNavigate();
@@ -22,14 +23,19 @@ const Catalog = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Загрузка категорий (ВЫНЕСИ ИЗ useEffect)
-  const loadCategories = async () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [itemsPerPage] = useState(20); // Сколько показывать на странице
+
+  // Загрузка категорий
+  const loadCategories = async (page = 1) => { // 🆕 Добавлен параметр page
     try {
       setLoading(true);
       setError(null);
 
-      console.log('🔄 Загрузка категорий...');
-      const response = await getCategories(1, 100);
+      console.log(`🔄 Загрузка категорий (страница ${page})...`); // 🆕 Изменен лог
+      const response = await getCategories(page, itemsPerPage); // 🆕 Изменено: page вместо 1, itemsPerPage вместо 100
 
       console.log('📦 Полученные данные:', response);
 
@@ -54,6 +60,13 @@ const Catalog = () => {
 
       setCategories(adaptedCategories);
 
+      // 🆕 ДОБАВЬ ЭТИ 5 СТРОК - сохраняем данные пагинации:
+      const totalItems = response.count || categories.length;
+      setCurrentPage(page);
+      setTotalCount(totalItems);
+      setTotalPages(Math.ceil(totalItems / itemsPerPage));
+      console.log(`📄 Страница ${page} из ${Math.ceil(totalItems / itemsPerPage)}, всего: ${totalItems}`);
+
     } catch (err) {
       console.error('❌ Ошибка загрузки категорий:', err);
       console.error('📝 Детали ошибки:', {
@@ -76,7 +89,7 @@ const Catalog = () => {
 
   // Загрузка категорий при монтировании компонента
   useEffect(() => {
-    loadCategories(); // ✅ Теперь функция определена выше
+    loadCategories(1); // 🆕 Передаём 1 - первую страницу
   }, []);
 
   // Загрузка товаров категории
@@ -311,15 +324,26 @@ const Catalog = () => {
           {loading ? (
             <div className="loading">Загрузка...</div>
           ) : (
-            <div className="categories-grid">
-              {data.map(category => (
-                <CategoryCard
-                  key={category.id}
-                  category={category}
-                  onClick={() => handleCategoryClick(category)}
+            <>
+              <div className="categories-grid">
+                {data.map(category => (
+                  <CategoryCard
+                    key={category.id}
+                    category={category}
+                    onClick={() => handleCategoryClick(category)}
+                  />
+                ))}
+              </div>
+
+              {/* 🆕 ДОБАВЛЕНА ПАГИНАЦИЯ ДЛЯ КАТЕГОРИЙ */}
+              {totalPages > 1 && (
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={(page) => loadCategories(page)}
                 />
-              ))}
-            </div>
+              )}
+            </>
           )}
         </div>
       )}
@@ -337,15 +361,30 @@ const Catalog = () => {
               <p>В этой категории пока нет товаров</p>
             </div>
           ) : (
-            <div className="products-grid">
-              {data.map(product => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  onClick={() => handleProductClick(product)}
+            <>
+              <div className="products-grid">
+                {data.map(product => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    onClick={() => handleProductClick(product)}
+                  />
+                ))}
+              </div>
+
+              {/* 🆕 ДОБАВЛЕНА ПАГИНАЦИЯ ДЛЯ ТОВАРОВ */}
+              {totalPages > 1 && (
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={(page) => {
+                    if (activeCategory) {
+                      loadCategoryProducts(activeCategory, page);
+                    }
+                  }}
                 />
-              ))}
-            </div>
+              )}
+            </>
           )}
         </div>
       )}
