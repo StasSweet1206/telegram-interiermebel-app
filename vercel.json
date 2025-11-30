@@ -1,4 +1,4 @@
-﻿{
+{
   "buildCommand": "npm run build",
   "outputDirectory": "build",
   "rewrites": [
@@ -23,10 +23,6 @@
         {
           "key": "X-Content-Type-Options",
           "value": "nosniff"
-        },
-        {
-          "key": "X-Frame-Options",
-          "value": "ALLOW-FROM https://web.telegram.org"
         },
         {
           "key": "Content-Security-Policy",
