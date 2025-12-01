@@ -185,7 +185,7 @@ const Catalog = () => {
 
     // По умолчанию показываем корневые категории
     const rootCategories = categories.filter(cat => cat.parentId === null);
-    return { type: 'categories', data: rootCategories };
+    return { type: 'categories', data: categories };
   };
 
   // Навигация по категории
