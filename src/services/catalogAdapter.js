@@ -16,7 +16,7 @@ export const adaptCategory = (category) => {
     products: [], // Будем загружать отдельно
     productsCount: category.products_count || 0,
     image: category.image,
-    parentId: category.parent
+    parentId: category.parent_id
   };
 };
 
