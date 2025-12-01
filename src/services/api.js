@@ -61,79 +61,158 @@ api.interceptors.response.use(
 
 // ==================== API ФУНКЦИИ ====================
 
-// Получение списка категорий с пагинацией
-const getCategories = async (page = 1, pageSize = 20) => {
-  const response = await api.get('/categories/', {
-    params: { page, page_size: pageSize }
-  });
-  return response;
+/**
+ * Получение списка категорий с пагинацией
+ * @param {number} page - номер страницы
+ * @param {number} pageSize - количество элементов на странице
+ */
+export const getCategories = async (page = 1, pageSize = 20) => {
+  try {
+    const response = await api.get('/categories/', {
+      params: {
+        page,
+        page_size: pageSize
+      }
+    });
+    return response;
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    throw error;
+  }
 };
 
-// Получение товаров категории с пагинацией
-const getCategoryProducts = async (categoryId, page = 1, pageSize = 20) => {
-  const response = await api.get(`/categories/${categoryId}/products/`, {
-    params: { page, page_size: pageSize }
-  });
-  return response;
+/**
+ * Получение товаров категории с пагинацией
+ * @param {number} categoryId - ID категории
+ * @param {number} page - номер страницы
+ * @param {number} pageSize - количество элементов на странице
+ */
+export const getCategoryProducts = async (categoryId, page = 1, pageSize = 20) => {
+  try {
+    const response = await api.get(`/categories/${categoryId}/products/`, {
+      params: {
+        page,
+        page_size: pageSize
+      }
+    });
+    return response;
+  } catch (error) {
+    console.error(`Error fetching products for category ${categoryId}:`, error);
+    throw error;
+  }
 };
 
-// Получение конкретного товара по ID
-const getProduct = async (productId) => {
-  const response = await api.get(`/products/${productId}/`);
-  return response;
+/**
+ * Получение конкретного товара по ID
+ * @param {number} productId - ID товара
+ */
+export const getProduct = async (productId) => {
+  try {
+    const response = await api.get(`/products/${productId}/`);
+    return response;
+  } catch (error) {
+    console.error(`Error fetching product ${productId}:`, error);
+    throw error;
+  }
 };
 
-// Получение всех товаров с пагинацией
-const getProducts = async (page = 1, pageSize = 20) => {
-  const response = await api.get('/products/', {
-    params: { page, page_size: pageSize }
-  });
-  return response;
+/**
+ * Получение всех товаров с пагинацией
+ * @param {number} page - номер страницы
+ * @param {number} pageSize - количество элементов на странице
+ */
+export const getProducts = async (page = 1, pageSize = 20) => {
+  try {
+    const response = await api.get('/products/', {
+      params: {
+        page,
+        page_size: pageSize
+      }
+    });
+    return response;
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    throw error;
+  }
 };
 
-// Поиск товаров
-const searchProducts = async (query, page = 1, pageSize = 20) => {
-  const response = await api.get('/products/search/', {
-    params: { q: query, page, page_size: pageSize }
-  });
-  return response;
+/**
+ * Поиск товаров
+ * @param {string} query - поисковый запрос
+ * @param {number} page - номер страницы
+ * @param {number} pageSize - количество элементов на странице
+ */
+export const searchProducts = async (query, page = 1, pageSize = 20) => {
+  try {
+    const response = await api.get('/products/search/', {
+      params: {
+        q: query,
+        page,
+        page_size: pageSize
+      }
+    });
+    return response;
+  } catch (error) {
+    console.error('Error searching products:', error);
+    throw error;
+  }
 };
 
-// Создание заказа
-const createOrder = async (orderData) => {
-  const response = await api.post('/orders/', orderData);
-  return response;
+/**
+ * Создание заказа
+ * @param {object} orderData - данные заказа
+ */
+export const createOrder = async (orderData) => {
+  try {
+    const response = await api.post('/orders/', orderData);
+    return response;
+  } catch (error) {
+    console.error('Error creating order:', error);
+    throw error;
+  }
 };
 
-// Получение заказов пользователя
-const getUserOrders = async (userId) => {
-  const response = await api.get(`/orders/user/${userId}/`);
-  return response;
+/**
+ * Получение заказов пользователя
+ * @param {number} userId - ID пользователя Telegram
+ */
+export const getUserOrders = async (userId) => {
+  try {
+    const response = await api.get(`/orders/user/${userId}/`);
+    return response;
+  } catch (error) {
+    console.error('Error fetching user orders:', error);
+    throw error;
+  }
 };
 
-// Получение конкретного заказа
-const getOrder = async (orderId) => {
-  const response = await api.get(`/orders/${orderId}/`);
-  return response;
+/**
+ * Получение конкретного заказа
+ * @param {number} orderId - ID заказа
+ */
+export const getOrder = async (orderId) => {
+  try {
+    const response = await api.get(`/orders/${orderId}/`);
+    return response;
+  } catch (error) {
+    console.error(`Error fetching order ${orderId}:`, error);
+    throw error;
+  }
 };
 
-// Проверка наличия товара
-const checkProductAvailability = async (productId) => {
-  const response = await api.get(`/products/${productId}/availability/`);
-  return response;
+/**
+ * Проверка наличия товара
+ * @param {number} productId - ID товара
+ */
+export const checkProductAvailability = async (productId) => {
+  try {
+    const response = await api.get(`/products/${productId}/availability/`);
+    return response;
+  } catch (error) {
+    console.error(`Error checking availability for product ${productId}:`, error);
+    throw error;
+  }
 };
 
-// ЭКСПОРТ ВСЕХ ФУНКЦИЙ
-export {
-  getCategories,
-  getCategoryProducts,
-  getProduct,
-  getProducts,
-  searchProducts,
-  createOrder,
-  getUserOrders,
-  getOrder,
-  checkProductAvailability
-};
-
+// Экспортируем axios instance для кастомных запросов
 export default api;
