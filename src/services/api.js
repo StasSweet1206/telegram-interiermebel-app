@@ -6,7 +6,7 @@ const API_URL = process.env.REACT_APP_API_URL || 'https://django-sso-production.
 // Создаем axios instance
 const api = axios.create({
   baseURL: API_URL,
-  timeout: 30000,
+  timeout: 30000, // ⬆️ Увеличили таймаут до 30 секунд
   headers: {
     'Content-Type': 'application/json',
   },
@@ -16,12 +16,11 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     console.log('🚀 Request:', config.method?.toUpperCase(), config.url);
-    console.log('📍 Full URL:', config.baseURL + config.url);
 
-    // 🔥 УБРАЛИ TELEGRAM ЗАГОЛОВОК - он вызывает CORS ошибку
-    // if (window.Telegram?.WebApp?.initData) {
-    //   config.headers['X-Telegram-Init-Data'] = window.Telegram.WebApp.initData;
-    // }
+    // 🆕 Добавляем Telegram данные в заголовки
+    if (window.Telegram?.WebApp?.initData) {
+      config.headers['X-Telegram-Init-Data'] = window.Telegram.WebApp.initData;
+    }
 
     return config;
   },
@@ -40,8 +39,6 @@ api.interceptors.response.use(
   },
   (error) => {
     console.error('❌ Response Error:', error.response?.status, error.message);
-    console.error('📍 URL:', error.config?.url);
-    console.error('📍 Full URL:', error.config?.baseURL + error.config?.url);
 
     if (error.response) {
       const status = error.response.status;
@@ -55,7 +52,6 @@ api.interceptors.response.use(
           break;
         case 404:
           console.error('Not Found - ресурс не найден');
-          console.error('Проверьте правильность URL на бэкенде');
           break;
         case 500:
           console.error('Server Error - ошибка сервера');
