@@ -6,7 +6,7 @@ const API_URL = process.env.REACT_APP_API_URL || 'https://django-sso-production.
 // Создаем axios instance
 const api = axios.create({
   baseURL: API_URL,
-  timeout: 30000, // ⬆️ Увеличили таймаут до 30 секунд
+  timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -17,7 +17,7 @@ api.interceptors.request.use(
   (config) => {
     console.log('🚀 Request:', config.method?.toUpperCase(), config.url);
 
-    // 🆕 Добавляем Telegram данные в заголовки
+    // Добавляем Telegram данные в заголовки
     if (window.Telegram?.WebApp?.initData) {
       config.headers['X-Telegram-Init-Data'] = window.Telegram.WebApp.initData;
     }
@@ -35,7 +35,10 @@ api.interceptors.response.use(
   (response) => {
     console.log('✅ Response:', response.status, response.config.url);
     console.log('📦 Response data:', response.data);
-    return response.data;
+
+    // ⚠️ ВАЖНО: Возвращаем полный response, а не response.data
+    // Потому что в catalogAdapter мы обращаемся к response.data
+    return response;
   },
   (error) => {
     console.error('❌ Response Error:', error.response?.status, error.message);
