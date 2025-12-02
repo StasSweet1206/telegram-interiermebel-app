@@ -1,147 +1,142 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Breadcrumbs from './Breadcrumbs';
 import CategoryCard from './CategoryCard';
 import ProductCard from './ProductCard';
 import ProductDetail from './ProductDetail';
-import Breadcrumbs from './Breadcrumbs';
-import Pagination from './Pagination';
-import { getCategories, getCategoryProducts, getProduct } from '../../services/api';
+import { getCategories, getCategoryProducts, getProduct } from '../../services/catalog';
+import { adaptCategory, adaptProduct } from '../../services/catalogAdapter';
 import './Catalog.css';
+import Pagination from './Pagination';
 
 const Catalog = () => {
   const navigate = useNavigate();
 
-  // Состояния для категорий
+  // Состояния
   const [categories, setCategories] = useState([]);
   const [currentCategoryId, setCurrentCategoryId] = useState(null);
-  const [navigationPath, setNavigationPath] = useState([]);
-
-  // 🆕 Состояния для пагинации категорий
-  const [categoriesPage, setCategoriesPage] = useState(1);
-  const [categoriesTotalPages, setCategoriesTotalPages] = useState(1);
-
-  // Состояния для товаров
   const [currentProducts, setCurrentProducts] = useState([]);
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
-
-  // 🆕 Состояния для пагинации товаров
-  const [productsPage, setProductsPage] = useState(1);
-  const [productsTotalPages, setProductsTotalPages] = useState(1);
-
-  // Общие состояния
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [navigationPath, setNavigationPath] = useState([]);
   const [cart, setCart] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState(null);
+  const [error, setError] = useState(null);
 
-  // Загрузка категорий при монтировании
-  useEffect(() => {
-    loadCategories(1);
-  }, []);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [itemsPerPage] = useState(20); // Сколько показывать на странице
 
-  // Функция адаптации товара
-  const adaptProduct = (product) => {
-    return {
-      id: product.id,
-      name: product.name || product.title || 'Без названия',
-      price: product.price || 0,
-      image: product.image || product.main_image || '/placeholder.jpg',
-      description: product.description || '',
-      category: product.category,
-      inStock: product.in_stock ?? true,
-      dimensions: product.dimensions || null,
-      material: product.material || null,
-      color: product.color || null,
-      images: product.images || []
-    };
-  };
-
-  // Загрузка категорий с пагинацией
-  const loadCategories = async (page = 1) => {
+  // Загрузка категорий
+  const loadCategories = async (page = 1) => { // 🆕 Добавлен параметр page
     try {
       setLoading(true);
       setError(null);
 
-      console.log(`📂 Загрузка категорий, страница ${page}`);
+      console.log(`🔄 Загрузка категорий (страница ${page})...`); // 🆕 Изменен лог
+      const response = await getCategories(page, itemsPerPage); // 🆕 Изменено: page вместо 1, itemsPerPage вместо 100
 
-      const response = await getCategories(page, 20);
+      console.log('📦 Полученные данные:', response);
 
-      console.log('📦 Полученные категории:', response);
-
-      let categoriesData = [];
-      let totalPages = 1;
+      // Определяем где находятся категории
+      let categories = [];
 
       if (Array.isArray(response)) {
-        categoriesData = response;
+        console.log('✅ Это массив, используем напрямую');
+        categories = response;
       } else if (response.results) {
-        categoriesData = response.results;
-        totalPages = Math.ceil(response.count / 20);
+        console.log('✅ Это объект с results');
+        categories = response.results;
       } else if (response.data) {
-        categoriesData = Array.isArray(response.data) ? response.data : response.data.results;
-        totalPages = response.data.count ? Math.ceil(response.data.count / 20) : 1;
+        console.log('✅ Это объект с data');
+        categories = Array.isArray(response.data) ? response.data : response.data.results;
       }
 
-      const adaptedCategories = categoriesData.map(cat => ({
-        id: cat.id,
-        name: cat.name,
-        description: cat.description || '',
-        image: cat.image || '/placeholder-category.jpg',
-        parentId: cat.parent || null
-      }));
+      console.log('🔢 Количество категорий:', categories.length);
+
+      // Адаптируем категории к нашему формату
+      const adaptedCategories = categories.map(adaptCategory);
 
       setCategories(adaptedCategories);
-      setCategoriesPage(page);
-      setCategoriesTotalPages(totalPages);
 
-      console.log(`✅ Загружено категорий: ${adaptedCategories.length}, всего страниц: ${totalPages}`);
+      // 🆕 ДОБАВЬ ЭТИ 5 СТРОК - сохраняем данные пагинации:
+      const totalItems = response.count || categories.length;
+      setCurrentPage(page);
+      setTotalCount(totalItems);
+      setTotalPages(Math.ceil(totalItems / itemsPerPage));
+      console.log(`📄 Страница ${page} из ${Math.ceil(totalItems / itemsPerPage)}, всего: ${totalItems}`);
 
     } catch (err) {
       console.error('❌ Ошибка загрузки категорий:', err);
-      setError('Не удалось загрузить категории. Попробуйте позже.');
+      console.error('📝 Детали ошибки:', {
+        message: err.message,
+        response: err.response,
+        request: err.request
+      });
+
+      setError('Не удалось загрузить категории');
+
+      if (window.Telegram?.WebApp?.showAlert) {
+        window.Telegram.WebApp.showAlert(
+          `Ошибка загрузки категорий: ${err.message}`
+        );
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  // Загрузка товаров категории с пагинацией
-  const loadCategoryProducts = async (categoryId, page = 1) => {
+  // Загрузка категорий при монтировании компонента
+  useEffect(() => {
+    loadCategories(1); // 🆕 Передаём 1 - первую страницу
+  }, []);
+
+  // Загрузка товаров категории
+  const loadCategoryProducts = async (categoryId) => {
     try {
       setLoading(true);
       setError(null);
-
-      console.log(`🔄 Загрузка товаров категории ${categoryId}, страница ${page}`);
-
-      const response = await getCategoryProducts(categoryId, page, 20);
+      console.log('🔄 Загрузка товаров категории:', categoryId);
+      const response = await getCategoryProducts(categoryId, 1, 100);
 
       console.log('📦 Полученные товары:', response);
 
+      // Определяем где находятся товары
       let products = [];
-      let totalPages = 1;
 
       if (Array.isArray(response)) {
+        console.log('✅ Это массив товаров');
         products = response;
       } else if (response.results) {
+        console.log('✅ Это объект с results');
         products = response.results;
-        totalPages = Math.ceil(response.count / 20);
       } else if (response.data) {
+        console.log('✅ Это объект с data');
         products = Array.isArray(response.data) ? response.data : response.data.results;
-        totalPages = response.data.count ? Math.ceil(response.data.count / 20) : 1;
       }
 
-      console.log(`🔢 Количество товаров: ${products.length}, всего страниц: ${totalPages}`);
+      console.log('🔢 Количество товаров:', products.length);
 
+      // Адаптируем товары к нашему формату
       const adaptedProducts = products.map(adaptProduct);
 
       setCurrentProducts(adaptedProducts);
-      setProductsPage(page);
-      setProductsTotalPages(totalPages);
 
     } catch (err) {
       console.error('❌ Ошибка загрузки товаров:', err);
+      console.error('📝 Детали ошибки:', {
+        message: err.message,
+        response: err.response
+      });
+
       setError('Не удалось загрузить товары. Попробуйте позже.');
 
       if (window.Telegram?.WebApp?.showAlert) {
-        window.Telegram.WebApp.showAlert(`Ошибка загрузки товаров: ${err.message}`);
+        window.Telegram.WebApp.showAlert(
+          `Ошибка загрузки товаров: ${err.message}`
+        );
       }
     } finally {
       setLoading(false);
@@ -158,31 +153,36 @@ const Catalog = () => {
       const adaptedProduct = adaptProduct(product);
 
       setSelectedProduct(adaptedProduct);
+      setLoading(false);
     } catch (err) {
       console.error('Ошибка загрузки товара:', err);
       setError('Не удалось загрузить товар. Попробуйте позже.');
-    } finally {
       setLoading(false);
     }
   };
 
   // Получаем текущие данные для отображения
   const getCurrentData = () => {
+    // Если выбран товар - показываем детальную страницу
     if (selectedProductId && selectedProduct) {
       return { type: 'product', data: selectedProduct };
     }
 
+    // Если выбрана категория - показываем товары
     if (currentCategoryId && currentProducts.length > 0) {
       return { type: 'products', data: currentProducts };
     }
 
+    // Если выбрана категория с подкатегориями
     if (currentCategoryId) {
       const subcategories = categories.filter(cat => cat.parentId === currentCategoryId);
+
       if (subcategories.length > 0) {
         return { type: 'categories', data: subcategories };
       }
     }
 
+    // По умолчанию показываем корневые категории
     const rootCategories = categories.filter(cat => cat.parentId === null);
     return { type: 'categories', data: rootCategories };
   };
@@ -192,14 +192,14 @@ const Catalog = () => {
     setCurrentCategoryId(category.id);
     setNavigationPath([...navigationPath, { id: category.id, name: category.name }]);
 
+    // Проверяем, есть ли у категории подкатегории
     const hasSubcategories = categories.some(cat => cat.parentId === category.id);
-
     if (!hasSubcategories) {
-      await loadCategoryProducts(category.id, 1);
+      // Если нет подкатегорий - загружаем товары
+      await loadCategoryProducts(category.id);
     } else {
+      // Если есть подкатегории - очищаем товары
       setCurrentProducts([]);
-      setProductsPage(1);
-      setProductsTotalPages(1);
     }
   };
 
@@ -207,25 +207,29 @@ const Catalog = () => {
   const handleProductClick = async (product) => {
     setSelectedProductId(product.id);
     setNavigationPath([...navigationPath, { id: product.id, name: product.name }]);
+
+    // Загружаем полную информацию о товаре
     await loadProduct(product.id);
   };
 
   // Навигация назад
   const handleNavigate = async (categoryId, index) => {
     if (categoryId === null) {
+      // Возврат на главную
       setCurrentCategoryId(null);
       setSelectedProductId(null);
       setSelectedProduct(null);
       setCurrentProducts([]);
       setNavigationPath([]);
-      setProductsPage(1);
-      setProductsTotalPages(1);
     } else {
+      // Возврат на определенный уровень
       setCurrentCategoryId(categoryId);
       setSelectedProductId(null);
       setSelectedProduct(null);
       setNavigationPath(navigationPath.slice(0, index + 1));
-      await loadCategoryProducts(categoryId, 1);
+
+      // Загружаем товары категории
+      await loadCategoryProducts(categoryId);
     }
   };
 
@@ -242,14 +246,17 @@ const Catalog = () => {
       const existingItemIndex = prevCart.findIndex(item => item.id === cartItem.id);
 
       if (existingItemIndex !== -1) {
+        // Товар уже в корзине - увеличиваем количество
         const newCart = [...prevCart];
         newCart[existingItemIndex].quantity += cartItem.quantity;
         return newCart;
       } else {
+        // Добавляем новый товар
         return [...prevCart, cartItem];
       }
     });
 
+    // Показываем уведомление
     if (window.Telegram?.WebApp) {
       window.Telegram.WebApp.showAlert(`Добавлено в корзину: ${cartItem.quantity} шт.`);
     }
@@ -279,14 +286,14 @@ const Catalog = () => {
       <div className="catalog">
         <div className="error">
           <p>{error}</p>
-          <button onClick={() => loadCategories(1)}>Повторить попытку</button>
+          <button onClick={loadCategories}>Повторить попытку</button>
         </div>
       </div>
     );
   }
-
   return (
     <div className="catalog">
+      {/* Хлебные крошки и кнопка домой */}
       {!selectedProductId && (
         <div className="catalog-header">
           <Breadcrumbs path={navigationPath} onNavigate={handleNavigate} />
@@ -296,6 +303,7 @@ const Catalog = () => {
         </div>
       )}
 
+      {/* Детальная страница товара */}
       {type === 'product' && (
         <ProductDetail
           product={data}
@@ -305,6 +313,7 @@ const Catalog = () => {
         />
       )}
 
+      {/* Список категорий */}
       {type === 'categories' && (
         <div className="catalog-content">
           <h2 className="catalog-title">
@@ -324,12 +333,12 @@ const Catalog = () => {
                 ))}
               </div>
 
-              {categoriesTotalPages > 1 && (
+              {/* 🆕 ДОБАВЛЕНА ПАГИНАЦИЯ ДЛЯ КАТЕГОРИЙ */}
+              {totalPages > 1 && (
                 <Pagination
-                  currentPage={categoriesPage}
-                  totalPages={categoriesTotalPages}
+                  currentPage={currentPage}
+                  totalPages={totalPages}
                   onPageChange={(page) => loadCategories(page)}
-                  loading={loading}
                 />
               )}
             </>
@@ -337,6 +346,7 @@ const Catalog = () => {
         </div>
       )}
 
+      {/* Список товаров */}
       {type === 'products' && (
         <div className="catalog-content">
           <h2 className="catalog-title">
@@ -360,12 +370,16 @@ const Catalog = () => {
                 ))}
               </div>
 
-              {productsTotalPages > 1 && (
+              {/* 🆕 ДОБАВЛЕНА ПАГИНАЦИЯ ДЛЯ ТОВАРОВ */}
+              {totalPages > 1 && (
                 <Pagination
-                  currentPage={productsPage}
-                  totalPages={productsTotalPages}
-                  onPageChange={(page) => loadCategoryProducts(currentCategoryId, page)}
-                  loading={loading}
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={(page) => {
+                    if (activeCategory) {
+                      loadCategoryProducts(activeCategory, page);
+                    }
+                  }}
                 />
               )}
             </>
@@ -373,6 +387,7 @@ const Catalog = () => {
         </div>
       )}
 
+      {/* Индикатор корзины (плавающая кнопка) */}
       {cart.length > 0 && !selectedProductId && (
         <div className="cart-indicator" onClick={() => navigate('/cart')}>
           <span className="cart-icon">🛒</span>
