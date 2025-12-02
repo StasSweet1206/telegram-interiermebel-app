@@ -6,7 +6,7 @@ const API_URL = process.env.REACT_APP_API_URL || 'https://django-sso-production.
 // Создаем axios instance
 const api = axios.create({
   baseURL: API_URL,
-  timeout: 10000,
+  timeout: 30000, // ⬆️ Увеличили таймаут до 30 секунд
   headers: {
     'Content-Type': 'application/json',
   },
@@ -16,6 +16,12 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     console.log('🚀 Request:', config.method?.toUpperCase(), config.url);
+
+    // 🆕 Добавляем Telegram данные в заголовки
+    if (window.Telegram?.WebApp?.initData) {
+      config.headers['X-Telegram-Init-Data'] = window.Telegram.WebApp.initData;
+    }
+
     return config;
   },
   (error) => {
@@ -53,6 +59,9 @@ api.interceptors.response.use(
       }
     } else if (error.request) {
       console.error('No response from server');
+      console.error('Возможно проблема с CORS или сервер недоступен');
+    } else {
+      console.error('Error:', error.message);
     }
 
     return Promise.reject(error);
