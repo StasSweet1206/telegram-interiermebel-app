@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 // Базовый URL вашего Django бэкенда на Railway
-const API_URL = process.env.REACT_APP_API_URL || 'https://sso-production-4c05.up.railway.app';
+// Для Vite используем import.meta.env вместо process.env
+const API_URL = import.meta.env.VITE_API_URL || 'https://sso-production-4c05.up.railway.app/api';
 
 // Создаем axios instance
 const api = axios.create({
