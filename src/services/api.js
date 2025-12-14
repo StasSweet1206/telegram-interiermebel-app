@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Базовый URL вашего Django бэкенда на Railway
-const API_URL = process.env.REACT_APP_API_URL || 'https://django-sso-production.up.railway.app/api';
+const API_URL = process.env.REACT_APP_API_URL || 'https://sso-production-4c05.up.railway.app';
 
 // Создаем axios instance
 const api = axios.create({
