@@ -3,6 +3,10 @@
   "outputDirectory": "build",
   "rewrites": [
     {
+      "source": "/api/:path*",
+      "destination": "https://sso-production-4c05.up.railway.app/api/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
