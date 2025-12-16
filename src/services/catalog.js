@@ -29,11 +29,20 @@ export const getCategoryTree = async () => {
 /**
  * Получить товары категории
  */
-export const getCategoryProducts = async (id, page = 1, pageSize = 20) => {
-  const response = await api.get(`/catalog/categories/${id}/products/`, {
-    params: { page, page_size: pageSize },
+export const getCategoryProducts = async (categoryCode, page = 1, pageSize = 20) => {
+  console.log('🔍 Запрос товаров для категории:', categoryCode);
+
+  // ✅ ИСПОЛЬЗУЕМ /products/ С ФИЛЬТРОМ!
+  const response = await api.get('/catalog/products/', {
+    params: {
+      category: categoryCode,  // ← Фильтр по code_1c
+      page,
+      page_size: pageSize
+    },
   });
-  return response;
+
+  console.log('✅ Получено товаров:', response.data);
+  return response.data;
 };
 
 /**

@@ -84,13 +84,15 @@ const Catalog = () => {
   };
 
   // Загрузка товаров категории с пагинацией
-  const loadCategoryProducts = async (categoryId, page = 1) => {
+  const loadCategoryProducts = async (categoryCode, page = 1) => {
     try {
       setLoading(true);
       setError(null);
 
-      console.log(`🔄 Загрузка товаров категории ${categoryId} (страница ${page})...`);
-      const response = await getCategoryProducts(categoryId, page, itemsPerPage);
+      console.log(`🔄 Загрузка товаров категории ${categoryCode} (страница ${page})...`);
+
+      // ✅ ПЕРЕДАЁМ code1c, а не id!
+      const response = await getCategoryProducts(categoryCode, page, itemsPerPage);
 
       console.log('📦 Полученные товары:', response);
 
