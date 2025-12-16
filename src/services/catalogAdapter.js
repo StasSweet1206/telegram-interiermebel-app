@@ -6,17 +6,25 @@
  * Преобразование категории Django в формат приложения
  */
 export const adaptCategory = (category) => {
+  // Определяем parentId из parent_code_1c
+  let parentId = null;
+  if (category.parent_code_1c &&
+    category.parent_code_1c !== '00000000-0000-0000-0000-000000000000') {
+    parentId = category.parent_code_1c;
+  }
+
   return {
     id: category.id,
     name: category.name,
-    slug: category.slug,
-    icon: '📁', // Можно брать из category.icon если есть
+    slug: category.slug || category.code_1c,
+    icon: '📁',
     hasSubcategories: (category.children && category.children.length > 0),
     subcategories: category.children?.map(child => child.id) || [],
-    products: [], // Будем загружать отдельно
+    products: [],
     productsCount: category.products_count || 0,
     image: category.image,
-    parentId: category.parent_id
+    parentId: parentId,
+    code1c: category.code_1c // Сохраняем для связи
   };
 };
 
