@@ -165,9 +165,14 @@ const Catalog = () => {
     }
 
     if (currentCategoryId) {
-      const subcategories = categories.filter(cat => cat.parentId === currentCategoryId);
-      if (subcategories.length > 0) {
-        return { type: 'categories', data: subcategories };
+      // ✅ ИЩЕМ ПО code1c!
+      const currentCategory = categories.find(cat => cat.id === currentCategoryId);
+      if (currentCategory) {
+        const subcategories = categories.filter(cat => cat.parentId === currentCategory.code1c);
+        console.log('📁 Подкатегории для', currentCategory.name, ':', subcategories);
+        if (subcategories.length > 0) {
+          return { type: 'categories', data: subcategories };
+        }
       }
     }
 
@@ -177,15 +182,107 @@ const Catalog = () => {
 
   // Навигация по категории
   const handleCategoryClick = async (category) => {
-    setCurrentCategoryId(category.id);
-    setNavigationPath([...navigationPath, { id: category.id, name: category.name }]);
+    console.log('🔍 Клик по категории:', category);
 
-    const hasSubcategories = categories.some(cat => cat.parentId === category.id);
-    if (!hasSubcategories) {
-      await loadCategoryProducts(category.id, 1); // Загружаем первую страницу товаров
-    } else {
+    setCurrentCategoryId(category.id);
+
+    // ✅ ПРАВИЛЬНАЯ НАВИГАЦИЯ - сохраняем и id, и code1c
+    setNavigationPath([...navigationPath, {
+      id: category.id,
+      name: category.name,
+      code1c: category.code1c  // ← ДОБАВИЛИ code1c!
+    }]);
+
+    // ✅ ПРАВИЛЬНАЯ ПРОВЕРКА ПОДКАТЕГОРИЙ
+    const subcategories = categories.filter(cat => cat.parentId === category.code1c);
+    console.log('📁 Найдено подкатегорий:', subcategories.length);
+
+    if (subcategories.length > 0) {
+      // Есть подкатегории - показываем их
+      console.log('✅ Показываем подкатегории');
       setCurrentProducts([]);
-      setProductsPage(1); // Сбрасываем страницу товаров
+      setProductsPage(1);
+    } else {
+      // Нет подкатегорий - загружаем товары
+      console.log('✅ Загружаем товары по code1c:', category.code1c);
+      await loadCategoryProducts(category.code1c, 1);
+    }
+  };
+
+  // Навигация назад
+  const handleBackClick = () => {
+    if (selectedProductId) {
+      // Возврат из карточки товара к списку товаров
+      setSelectedProductId(null);
+      setSelectedProduct(null);
+      return;
+    }
+
+    if (navigationPath.length > 0) {
+      const newPath = navigationPath.slice(0, -1);
+      setNavigationPath(newPath);
+
+      if (newPath.length === 0) {
+        // Вернулись к корню
+        setCurrentCategoryId(null);
+        setCurrentProducts([]);
+        setProductsPage(1);
+      } else {
+        // Вернулись к предыдущей категории
+        const previousCategory = newPath[newPath.length - 1];
+        setCurrentCategoryId(previousCategory.id);
+
+        // ✅ ПРОВЕРЯЕМ ПОДКАТЕГОРИИ С code1c
+        const category = categories.find(cat => cat.id === previousCategory.id);
+        if (category) {
+          const subcategories = categories.filter(cat => cat.parentId === category.code1c);
+
+          if (subcategories.length === 0) {
+            // Нет подкатегорий - загружаем товары
+            loadCategoryProducts(category.code1c, 1);
+          } else {
+            // Есть подкатегории - очищаем товары
+            setCurrentProducts([]);
+            setProductsPage(1);
+          }
+        }
+      }
+    }
+  };
+
+  // Навигация по хлебным крошкам
+  const handleBreadcrumbClick = (index) => {
+    if (index === -1) {
+      // Клик на "Главная"
+      setNavigationPath([]);
+      setCurrentCategoryId(null);
+      setCurrentProducts([]);
+      setProductsPage(1);
+      setSelectedProductId(null);
+      setSelectedProduct(null);
+    } else if (index < navigationPath.length - 1) {
+      // Клик на промежуточную категорию
+      const newPath = navigationPath.slice(0, index + 1);
+      setNavigationPath(newPath);
+
+      const targetCategory = newPath[newPath.length - 1];
+      setCurrentCategoryId(targetCategory.id);
+
+      // ✅ ПРОВЕРЯЕМ ПОДКАТЕГОРИИ С code1c
+      const category = categories.find(cat => cat.id === targetCategory.id);
+      if (category) {
+        const subcategories = categories.filter(cat => cat.parentId === category.code1c);
+
+        if (subcategories.length === 0) {
+          loadCategoryProducts(category.code1c, 1);
+        } else {
+          setCurrentProducts([]);
+          setProductsPage(1);
+        }
+      }
+
+      setSelectedProductId(null);
+      setSelectedProduct(null);
     }
   };
 
