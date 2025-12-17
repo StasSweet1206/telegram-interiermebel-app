@@ -1,14 +1,22 @@
 import api from './api';
 
 /**
- * Получить список всех категорий
+ * Получить категории (корневые или подкатегории)
+ * @param {string|null} parentCode - код родительской категории (null = корневые)
  */
-export const getCategories = async (page = 1, pageSize = 100) => {
-  console.log('🔍 getCategories запрос:', { page, pageSize });
+export const getCategories = async (parentCode = null, page = 1, pageSize = 100) => {
+  console.log('🔍 getCategories запрос:', { parentCode, page, pageSize });
 
-  const response = await api.get('/catalog/categories/', {
-    params: { page, page_size: pageSize },
-  });
+  const params = { page, page_size: pageSize };
+
+  // ✅ Добавляем параметр parent как в Django
+  if (parentCode === null) {
+    params.parent = 'root';  // Корневые категории
+  } else {
+    params.parent = parentCode;  // Подкатегории
+  }
+
+  const response = await api.get('/catalog/categories/', { params });
 
   console.log('📦 getCategories RAW ответ:', response.data);
   return response.data;
@@ -27,14 +35,15 @@ export const getCategory = async (id) => {
 };
 
 /**
- * Получить товары категории (с фильтром по code_1c)
+ * Получить товары категории (по code_1c)
+ * @param {string} categoryCode - code_1c категории
  */
 export const getCategoryProducts = async (categoryCode, page = 1, pageSize = 20) => {
   console.log('🔍 getCategoryProducts запрос:', { categoryCode, page, pageSize });
 
   const response = await api.get('/catalog/products/', {
     params: {
-      category: categoryCode,  // ← Фильтр по code_1c
+      category: categoryCode,  // ✅ Фильтр по code_1c как в Django
       page,
       page_size: pageSize
     },
@@ -76,8 +85,8 @@ export const getProduct = async (id) => {
 export const searchProducts = async (query, filters = {}) => {
   console.log('🔍 searchProducts запрос:', { query, filters });
 
-  const response = await api.get('/catalog/products/search/', {
-    params: { q: query, ...filters },
+  const response = await api.get('/catalog/products/', {
+    params: { search: query, ...filters },  // ✅ Используем 'search' как в Django
   });
 
   console.log('📦 searchProducts ответ:', response.data);
@@ -85,12 +94,12 @@ export const searchProducts = async (query, filters = {}) => {
 };
 
 /**
- * Получить дерево категорий (если есть endpoint)
+ * Получить дерево категорий (для меню)
  */
 export const getCategoryTree = async () => {
   console.log('🔍 getCategoryTree запрос');
 
-  const response = await api.get('/catalog/categories/tree/');
+  const response = await api.get('/catalog/category-tree/');  // ✅ Правильный endpoint
 
   console.log('📦 getCategoryTree ответ:', response.data);
   return response.data;
