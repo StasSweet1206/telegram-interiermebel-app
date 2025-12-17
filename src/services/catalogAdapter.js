@@ -14,37 +14,41 @@ export const adaptCategory = (category) => {
     parent_id: category.parent_id
   });
 
-  // ✅ Сначала пробуем взять parent_id из Django
-  let parentId = category.parent || category.parent_id || category.parentId || null;
+  // ✅ ИСПРАВЛЕНО: Правильная обработка parentId
+  let parentId = null;
 
-  // ✅ Если его нет - пытаемся определить из parent_code_1c (для обратной совместимости)
-  if (!parentId && category.parent_code_1c &&
-    category.parent_code_1c !== '00000000-0000-0000-0000-000000000000') {
-    // Это для случая если Django не отдаёт parent_id
-    // Но обычно это не сработает, т.к. нам нужен ID, а не code
-    console.warn('⚠️ parent_id не найден, parent_code_1c:', category.parent_code_1c);
+  // Проверяем все возможные варианты
+  if (category.parent !== undefined && category.parent !== null) {
+    parentId = category.parent;
+  } else if (category.parent_id !== undefined && category.parent_id !== null) {
+    parentId = category.parent_id;
+  } else if (category.parentId !== undefined && category.parentId !== null) {
+    parentId = category.parentId;
   }
 
   const adapted = {
     id: category.id,
     name: category.name,
     code1c: category.code_1c,
-    parentCode1c: category.parent_code_1c,  // ← оставим для совместимости
-    parentId: parentId,                      // ← ОДИН РАЗ!
+    parentCode1c: category.parent_code_1c,
+    parentId: parentId,  // ✅ Теперь это число или null
     imageUrl: category.image || null,
     description: category.description || '',
     productsCount: category.products_count || 0,
+    hasChildren: category.has_children || false,  // ✅ ДОБАВЛЕНО!
   };
 
   console.log('✅ Адаптированная категория:', {
     id: adapted.id,
     name: adapted.name,
     parentId: adapted.parentId,
+    hasChildren: adapted.hasChildren,
     parentCode1c: adapted.parentCode1c
   });
 
   return adapted;
 };
+
 /**
  * Преобразование товара Django в формат приложения
  */
@@ -78,7 +82,6 @@ export const adaptProduct = (product) => {
       id: char.id,
       name: char.characteristic_name,
       value: char.value,
-      // Если характеристика влияет на цену, можно добавить логику
       price: parseFloat(product.price),
       stock: product.stock,
       image: null
