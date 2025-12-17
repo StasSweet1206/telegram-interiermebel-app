@@ -195,7 +195,6 @@ const Catalog = () => {
       console.log('🔍 Найдена категория:', currentCategory);
 
       if (currentCategory) {
-        // ✅ ИСПРАВЛЕНО: Проверяем подкатегории по parentId
         const subcategories = categories.filter(cat => cat.parentId === currentCategory.id);
         console.log('📁 Найдено подкатегорий в памяти:', subcategories.length);
 
@@ -203,7 +202,6 @@ const Catalog = () => {
           console.log('📂 Подкатегории должны быть - загружаем');
           loadSubcategories(currentCategory.id);
         } else if (subcategories.length === 0 && !currentCategory.hasChildren) {
-          // ✅ ИСПРАВЛЕНО: Загружаем товары по code1c
           console.log('🛒 Загружаем товары для категории code1c:', currentCategory.code1c);
           if (currentCategory.code1c) {
             loadCategoryProducts(currentCategory.code1c, 1);
@@ -213,7 +211,8 @@ const Catalog = () => {
         }
       }
     }
-  }, [currentCategoryId, currentProducts.length, categories]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentCategoryId, currentProducts.length]); // ✅ БЕЗ categories
 
   // ✅ ИСПРАВЛЕНО: Определение текущих данных для отображения
   const getCurrentData = () => {
