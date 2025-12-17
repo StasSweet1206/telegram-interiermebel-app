@@ -263,32 +263,34 @@ const Catalog = () => {
     return { type: 'categories', data: rootCategories };
   };
 
-  // ✅ ИСПРАВЛЕНО: Навигация по категории
   const handleCategoryClick = async (category) => {
     console.log('🔍 Клик по категории:', category);
-    console.log('📌 code1c категории:', category.code1c);
+    console.log('📌 Полная информация:', {
+      id: category.id,
+      name: category.name,
+      code1c: category.code1c,
+      hasChildren: category.hasChildren,
+      productsCount: category.productsCount
+    });
+
     setCurrentCategoryId(category.id);
 
-    // Сохраняем путь с ID
-    setNavigationPath([...navigationPath, {
-      id: category.id,
-      name: category.name
-    }]);
-
-    // ✅ Загружаем подкатегории по ID
+    // ✅ Сначала пробуем загрузить подкатегории
+    console.log('📂 Загружаем подкатегории для категории ID:', category.id);
     const subcategories = await loadSubcategories(category.id);
 
-    if (subcategories.length > 0) {
-      // Есть подкатегории - показываем их
-      console.log('✅ Показываем подкатегории');
-      setCurrentProducts([]);
-      setProductsPage(1);
-    } else {
-      // ✅ ИСПРАВЛЕНО: Загружаем товары по code1c
-      console.log('✅ Загружаем товары для категории code1c:', category.code1c);
+    // Если подкатегорий нет - загружаем товары
+    if (!subcategories || subcategories.length === 0) {
+      console.log('📦 Подкатегорий нет, загружаем товары');
+      console.log('🔑 Используем code1c:', category.code1c);
+
       if (category.code1c) {
-        await loadCategoryProducts(category.code1c, 1);
+        await loadCategoryProducts(category.code1c);
+      } else {
+        console.error('❌ У категории нет code1c!');
       }
+    } else {
+      console.log('📁 Показываем подкатегории:', subcategories.length);
     }
   };
 

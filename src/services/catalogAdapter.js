@@ -58,6 +58,7 @@ export const adaptProduct = (product) => {
     id: product.id,
     name: product.name,
     slug: product.slug,
+    code1c: product.code_1c,
     categoryId: product.category,
     categoryName: product.category_name,
     basePrice: parseFloat(product.price),
