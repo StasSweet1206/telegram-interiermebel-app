@@ -6,6 +6,12 @@
  * Преобразование категории Django в формат приложения
  */
 export const adaptCategory = (category) => {
+  console.log('🔄 Адаптация категории:', {
+    name: category.name,
+    code_1c: category.code_1c,
+    parent_code_1c: category.parent_code_1c
+  });
+
   // Определяем parentId из parent_code_1c
   let parentId = null;
   if (category.parent_code_1c &&
@@ -13,19 +19,18 @@ export const adaptCategory = (category) => {
     parentId = category.parent_code_1c;
   }
 
-  return {
+  const adapted = {
     id: category.id,
     name: category.name,
-    slug: category.slug || category.code_1c,
-    icon: '📁',
-    hasSubcategories: (category.children && category.children.length > 0),
-    subcategories: category.children?.map(child => child.id) || [],
-    products: [],
+    code1c: category.code_1c,           // ← Для поиска подкатегорий
+    parentId: parentId,                 // ← Для определения иерархии
+    imageUrl: category.image || null,
+    description: category.description || '',
     productsCount: category.products_count || 0,
-    image: category.image,
-    parentId: parentId,
-    code1c: category.code_1c // Сохраняем для связи
   };
+
+  console.log('✅ Адаптированная категория:', adapted);
+  return adapted;
 };
 
 /**

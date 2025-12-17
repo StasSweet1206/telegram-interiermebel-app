@@ -42,29 +42,36 @@ const Catalog = () => {
       setError(null);
 
       console.log(`🔄 Загрузка категорий (страница ${page})...`);
-      const response = await getCategories(page, itemsPerPage);
+      const data = await getCategories(page, itemsPerPage);
 
-      console.log('📦 Полученные данные категорий:', response);
+      console.log('📦 Полученные данные категорий:', data);
 
-      // Определяем где находятся категории
+      // ✅ Теперь data - это УЖЕ response.data из catalog.js
       let categoriesData = [];
+      let totalItems = 0;
 
-      if (Array.isArray(response)) {
-        categoriesData = response;
-      } else if (response.results) {
-        categoriesData = response.results;
-      } else if (response.data) {
-        categoriesData = Array.isArray(response.data) ? response.data : response.data.results;
+      if (Array.isArray(data)) {
+        // Простой массив категорий
+        categoriesData = data;
+        totalItems = data.length;
+      } else if (data.results) {
+        // Пагинированный ответ
+        categoriesData = data.results;
+        totalItems = data.count || data.results.length;
       }
 
       console.log('🔢 Количество категорий:', categoriesData.length);
+      console.log('📊 Всего категорий:', totalItems);
 
       // Адаптируем категории
       const adaptedCategories = categoriesData.map(adaptCategory);
+
+      console.log('✅ Адаптированные категории:', adaptedCategories);
+      console.log('🔍 Пример первой категории:', adaptedCategories[0]);
+
       setCategories(adaptedCategories);
 
       // Сохраняем пагинацию для категорий
-      const totalItems = response.count || categoriesData.length;
       setCategoriesPage(page);
       setCategoriesTotalCount(totalItems);
       setCategoriesTotalPages(Math.ceil(totalItems / itemsPerPage));
@@ -73,6 +80,7 @@ const Catalog = () => {
 
     } catch (err) {
       console.error('❌ Ошибка загрузки категорий:', err);
+      console.error('❌ Детали ошибки:', err.response?.data);
       setError('Не удалось загрузить категории');
 
       if (window.Telegram?.WebApp?.showAlert) {
@@ -153,32 +161,82 @@ const Catalog = () => {
 
   // Загрузка категорий при монтировании
   useEffect(() => {
+    console.log('🚀 Компонент Catalog монтируется');
     loadCategories(1);
   }, []);
 
+  useEffect(() => {
+    console.log('📊 Categories обновлены:', {
+      total: categories.length,
+      root: categories.filter(c => c.parentId === null).length,
+      withParent: categories.filter(c => c.parentId !== null).length
+    });
+
+    // Группируем по родителям
+    const grouped = categories.reduce((acc, cat) => {
+      const key = cat.parentId || 'root';
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(cat.name);
+      return acc;
+    }, {});
+
+    console.log('🌳 Структура категорий:', grouped);
+  }, [categories]);
+
   // Получаем текущие данные для отображения
   const getCurrentData = () => {
+    console.log('🎯 getCurrentData вызван:', {
+      selectedProductId,
+      currentCategoryId,
+      productsCount: currentProducts.length,
+      categoriesTotal: categories.length
+    });
+
+    // 1. Если выбран товар
     if (selectedProductId && selectedProduct) {
+      console.log('✅ Возвращаем ТОВАР:', selectedProduct.name);
       return { type: 'product', data: selectedProduct };
     }
 
+    // 2. Если есть категория И товары загружены
     if (currentCategoryId && currentProducts.length > 0) {
+      console.log('✅ Возвращаем ТОВАРЫ, количество:', currentProducts.length);
       return { type: 'products', data: currentProducts };
     }
 
+    // 3. Если есть категория - ищем подкатегории
     if (currentCategoryId) {
-      // ✅ ИЩЕМ ПО code1c!
       const currentCategory = categories.find(cat => cat.id === currentCategoryId);
+      console.log('🔍 Текущая категория:', currentCategory);
+
       if (currentCategory) {
-        const subcategories = categories.filter(cat => cat.parentId === currentCategory.code1c);
-        console.log('📁 Подкатегории для', currentCategory.name, ':', subcategories);
+        console.log('🔑 Ищем подкатегории с parentId:', currentCategory.code1c);
+
+        const subcategories = categories.filter(cat => {
+          const isMatch = cat.parentId === currentCategory.code1c;
+          if (isMatch) {
+            console.log('  ✅ Найдена подкатегория:', cat.name);
+          }
+          return isMatch;
+        });
+
+        console.log('📁 Всего подкатегорий:', subcategories.length);
+
         if (subcategories.length > 0) {
+          console.log('✅ Возвращаем ПОДКАТЕГОРИИ');
           return { type: 'categories', data: subcategories };
+        } else {
+          console.log('⚠️ Подкатегорий НЕТ, категория конечная');
         }
+      } else {
+        console.log('❌ Категория не найдена в массиве categories!');
       }
     }
 
+    // 4. Корневые категории
     const rootCategories = categories.filter(cat => cat.parentId === null);
+    console.log('✅ Возвращаем КОРНЕВЫЕ категории:', rootCategories.length);
+
     return { type: 'categories', data: rootCategories };
   };
 
