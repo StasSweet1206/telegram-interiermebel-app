@@ -133,10 +133,15 @@ const Catalog = () => {
       return (
         <>
           {currentProducts.length > 0 && (
-            <ProductGrid
-              products={currentProducts}
-              onProductClick={handleProductClick}
-            />
+            <div className="products-grid">
+              {currentProducts.map(product => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onClick={() => handleProductClick(product)}
+                />
+              ))}
+            </div>
           )}
           {isLoading && <div className="catalog-loading">Загрузка товаров...</div>}
           {!isLoading && currentProducts.length === 0 && (
