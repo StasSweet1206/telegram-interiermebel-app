@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getCategories, getCategoryProducts, getProduct } from '../../services/api'; // ✅ ИСПРАВЛЕНО
+import { getCategories, getCategoryProducts, getProduct } from '../../services/catalog';
 import CategoryCard from './CategoryCard';
 import ProductCard from './ProductCard';
 import ProductDetail from './ProductDetail';
