@@ -237,7 +237,17 @@ const Catalog = () => {
     }
 
     // 4. Корневые категории
-    const rootCategories = categories.filter(cat => !cat.parentCode1c); // ✅ ИСПРАВЛЕНО
+    console.log('🔍 ВСЕ категории:', categories);
+    console.log('🔍 Первая категория:', categories[0]);
+    console.log('🔍 parentCode1c первой:', categories[0]?.parentCode1c);
+    console.log('🔍 typeof parentCode1c:', typeof categories[0]?.parentCode1c);
+
+    const rootCategories = categories.filter(cat => {
+      const isRoot = !cat.parentCode1c || cat.parentCode1c === '' || cat.parentCode1c === '00000000-0000-0000-0000-000000000000';
+      console.log(`🔍 Категория "${cat.name}": parentCode1c="${cat.parentCode1c}", isRoot=${isRoot}`);
+      return isRoot;
+    });
+
     console.log('✅ Возвращаем КОРНЕВЫЕ категории:', rootCategories.length);
 
     return { type: 'categories', data: rootCategories };
