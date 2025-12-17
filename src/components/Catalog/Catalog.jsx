@@ -209,33 +209,49 @@ const Catalog = () => {
       const currentCategory = categories.find(cat => cat.id === currentCategoryId);
       console.log('🔍 Текущая категория:', currentCategory);
 
-      if (currentCategory) {
-        console.log('🔑 Ищем подкатегории с parentId:', currentCategory.code1c);
-
-        const subcategories = categories.filter(cat => {
-          const isMatch = cat.parentId === currentCategory.code1c;
-          if (isMatch) {
-            console.log('  ✅ Найдена подкатегория:', cat.name);
-          }
-          return isMatch;
-        });
-
-        console.log('📁 Всего подкатегорий:', subcategories.length);
-
-        if (subcategories.length > 0) {
-          console.log('✅ Возвращаем ПОДКАТЕГОРИИ');
-          return { type: 'categories', data: subcategories };
-        } else {
-          console.log('⚠️ Подкатегорий НЕТ, категория конечная');
-        }
-      } else {
+      if (!currentCategory) {
         console.log('❌ Категория не найдена в массиве categories!');
+        const rootCategories = categories.filter(cat => cat.parentId === null);
+        return { type: 'categories', data: rootCategories };
+      }
+
+      // 🔍 ЛОГИРУЕМ ВСЕ КАТЕГОРИИ И ИХ РОДИТЕЛЕЙ
+      console.log('📋 ВСЕ категории с их parentId:');
+      categories.forEach(cat => {
+        console.log(`  - ID:${cat.id} "${cat.name}": code1c="${cat.code1c}", parentId="${cat.parentId}"`);
+      });
+
+      // 🔑 ИЩЕМ ПОДКАТЕГОРИИ
+      console.log('🔑 Ищем подкатегории где parentId === currentCategory.code1c');
+      console.log(`   Целевой code1c: "${currentCategory.code1c}"`);
+
+      const subcategories = categories.filter(cat => {
+        const isMatch = cat.parentId === currentCategory.code1c;
+
+        // Логируем ВСЕ проверки
+        if (cat.parentId) {
+          console.log(`  🔍 "${cat.name}": parentId="${cat.parentId}" === "${currentCategory.code1c}" ? ${isMatch}`);
+        }
+
+        return isMatch;
+      });
+
+      console.log('📁 Найдено подкатегорий:', subcategories.length);
+
+      if (subcategories.length > 0) {
+        console.log('✅ Возвращаем ПОДКАТЕГОРИИ:', subcategories.map(c => c.name));
+        return { type: 'categories', data: subcategories };
+      } else {
+        console.log('⚠️ Подкатегорий НЕТ, категория конечная');
+        console.log('🛒 Загружаем товары для code1c:', currentCategory.code1c);
+        // Товары загрузятся через useEffect выше
       }
     }
 
     // 4. Корневые категории
     const rootCategories = categories.filter(cat => cat.parentId === null);
     console.log('✅ Возвращаем КОРНЕВЫЕ категории:', rootCategories.length);
+    console.log('📋 Корневые:', rootCategories.map(c => c.name));
 
     return { type: 'categories', data: rootCategories };
   };
