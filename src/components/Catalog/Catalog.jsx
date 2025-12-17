@@ -68,7 +68,7 @@ const Catalog = () => {
     stepOrder: product.step_order || 1
   });
 
-  // ✅ ДОБАВЛЕНО: Загрузка подкатегорий
+  // ✅ ИСПРАВЛЕНО: Загрузка подкатегорий
   const loadSubcategories = async (parentId) => {
     try {
       setIsLoading(true);
@@ -81,15 +81,10 @@ const Catalog = () => {
 
       const adaptedSubcategories = subcategoriesData.map(adaptCategory);
 
-      // ✅ Добавляем в общий массив, избегая дубликатов
-      setCategories(prev => {
-        const existingIds = new Set(prev.map(c => c.id));
-        const newCategories = adaptedSubcategories.filter(c => !existingIds.has(c.id));
-        console.log('➕ Добавляем новых категорий:', newCategories.length);
-        return [...prev, ...newCategories];
-      });
+      // ✅ ЗАМЕНЯЕМ категории, а не добавляем
+      setCategories(adaptedSubcategories);
 
-      console.log('✅ Подкатегории загружены и добавлены в память');
+      console.log('✅ Подкатегории загружены и ЗАМЕНИЛИ предыдущие');
       return adaptedSubcategories;
 
     } catch (err) {
@@ -99,33 +94,6 @@ const Catalog = () => {
       setIsLoading(false);
     }
   };
-
-  // Загрузка корневых категорий
-  const loadRootCategories = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      console.log('🌳 Загружаем ТОЛЬКО корневые категории');
-
-      const response = await getCategories();
-      const rootCategoriesData = response.results || response;
-
-      console.log('📦 Получено корневых категорий:', rootCategoriesData.length);
-
-      const adaptedCategories = rootCategoriesData.map(adaptCategory);
-      setCategories(adaptedCategories);
-
-      console.log('✅ Корневые категории загружены:', adaptedCategories);
-
-    } catch (err) {
-      console.error('❌ Ошибка загрузки корневых категорий:', err);
-      setError('Не удалось загрузить категории');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // Загрузка товаров категории
   const loadCategoryProducts = async (categoryCode, page = 1) => {
     try {

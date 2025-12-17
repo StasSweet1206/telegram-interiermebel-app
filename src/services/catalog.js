@@ -305,12 +305,8 @@ export const getStats = async () => {
   }
 };
 
-/**
- * Проверить работу API
- */
 export const healthCheck = async () => {
   console.log('🔍 healthCheck запрос');
-
   try {
     const response = await api.get('/catalog/health/');
     console.log('📦 healthCheck ответ:', response.data);
