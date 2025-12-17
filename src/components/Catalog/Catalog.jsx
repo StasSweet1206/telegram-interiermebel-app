@@ -218,12 +218,12 @@ const Catalog = () => {
 
       if (!currentCategory) {
         console.log('❌ Категория не найдена!');
-        const rootCategories = categories.filter(cat => cat.parentId === null);
+        const rootCategories = categories.filter(cat => !cat.parentCode1c); // ✅ ИСПРАВЛЕНО
         return { type: 'categories', data: rootCategories };
       }
 
       // ✅ ИЩЕМ УЖЕ ЗАГРУЖЕННЫЕ подкатегории
-      const subcategories = categories.filter(cat => cat.parentId === currentCategory.code1c);
+      const subcategories = categories.filter(cat => cat.parentCode1c === currentCategory.code1c);
 
       console.log('📁 Найдено подкатегорий в памяти:', subcategories.length);
 
@@ -237,7 +237,7 @@ const Catalog = () => {
     }
 
     // 4. Корневые категории
-    const rootCategories = categories.filter(cat => cat.parentId === null);
+    const rootCategories = categories.filter(cat => !cat.parentCode1c); // ✅ ИСПРАВЛЕНО
     console.log('✅ Возвращаем КОРНЕВЫЕ категории:', rootCategories.length);
 
     return { type: 'categories', data: rootCategories };
