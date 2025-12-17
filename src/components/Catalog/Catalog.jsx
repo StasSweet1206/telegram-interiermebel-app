@@ -10,7 +10,7 @@ import {
   getSubcategories,
   getCategoryProducts,
   getProduct
-} from '../../services/сatalog';
+} from '../../services/catalog';
 import './Catalog.css';
 
 const Catalog = () => {
