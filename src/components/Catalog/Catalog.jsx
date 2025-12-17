@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import CategoryCard from '../components/CategoryCard';
-import ProductCard from '../components/ProductCard';
-import ProductDetail from '../components/ProductDetail';
-import Breadcrumbs from '../components/Breadcrumbs';
-import Pagination from '../components/Pagination';
+import CategoryCard from './CategoryCard';
+import ProductCard from './ProductCard';
+import ProductDetail from './ProductDetail';
+import Breadcrumbs from './Breadcrumbs';
+import Pagination from './Pagination';
 import {
   getRootCategories,
   getSubcategories,
