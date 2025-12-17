@@ -98,10 +98,13 @@ const Catalog = () => {
 
       console.log('✅ Получено подкатегорий:', data.categories.length);
 
-      setCategories(data.categories);  // ✅ Берем из data.categories
+      setCategories(data.categories);
+
+      return data.categories;  // ✅ ДОБАВЛЕНО: возвращаем категории
     } catch (error) {
       console.error('❌ Ошибка загрузки подкатегорий:', error);
       setError(error.message);
+      return [];  // ✅ ДОБАВЛЕНО: при ошибке возвращаем пустой массив
     } finally {
       setIsLoading(false);
     }
@@ -133,6 +136,43 @@ const Catalog = () => {
       setLoading(false);
     }
   };
+
+  // Загрузка товаров категории
+  const loadProducts = useCallback(async (categoryCode) => {
+    console.log('🛒 Загружаем товары для категории:', categoryCode);
+
+    if (!categoryCode) {
+      console.warn('⚠️ categoryCode пустой, пропускаем загрузку');
+      setCurrentProducts([]);
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      // ✅ Передаем объект с фильтрами
+      const filters = {
+        category: categoryCode,  // Или category_code, проверьте что принимает бэкенд
+        page: 1,
+        page_size: 20
+      };
+
+      console.log('📤 Фильтры для загрузки товаров:', filters);
+
+      const data = await getProducts(filters);
+
+      console.log('✅ Получено товаров:', data.products.length);
+
+      setCurrentProducts(data.products);
+    } catch (error) {
+      console.error('❌ Ошибка загрузки товаров:', error);
+      console.error('📋 Детали ошибки:', error.response?.data);
+      setError(error.message);
+      setCurrentProducts([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   // Загрузка одного товара
   const loadProduct = async (productId) => {
@@ -259,8 +299,10 @@ const Catalog = () => {
     });
 
     setCurrentCategoryId(category.id);
+    setSelectedProductId(null);
+    setSelectedProduct(null);
 
-    // ✅ Сначала пробуем загрузить подкатегории
+    // Сначала пробуем загрузить подкатегории
     console.log('📂 Загружаем подкатегории для категории ID:', category.id);
     const subcategories = await loadSubcategories(category.id);
 
@@ -270,7 +312,7 @@ const Catalog = () => {
       console.log('🔑 Используем code1c:', category.code1c);
 
       if (category.code1c) {
-        await loadCategoryProducts(category.code1c);
+        await loadProducts(category.code1c);  // ✅ ИЗМЕНЕНО
       } else {
         console.error('❌ У категории нет code1c!');
       }
