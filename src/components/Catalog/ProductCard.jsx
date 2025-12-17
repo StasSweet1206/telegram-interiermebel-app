@@ -1,4 +1,3 @@
-import { getCategories, getProducts } from '../../api/catalog';
 import React from 'react';
 import './ProductCard.css';
 
