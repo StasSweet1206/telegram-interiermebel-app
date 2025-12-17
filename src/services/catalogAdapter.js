@@ -32,7 +32,7 @@ export const adaptCategory = (category) => {
     name: category.name,
     code1c: category.code_1c,
     parentCode1c: category.parent_code_1c,
-    parentId: parentId,  // ✅ Теперь это число или null
+    parentId: category.parent !== undefined ? category.parent : category.parent_id,
     imageUrl: category.image || null,
     description: category.description || '',
     productsCount: category.products_count || 0,
