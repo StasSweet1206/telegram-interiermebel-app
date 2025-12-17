@@ -2,24 +2,38 @@ import api from './api';
 
 /**
  * Получить категории (корневые или подкатегории)
- * @param {string|null} parentCode - код родительской категории (null = корневые)
+ * @param {number|null} parentId - ID родительской категории (null = корневые)
  */
-export const getCategories = async (parentCode = null, page = 1, pageSize = 100) => {
-  console.log('🔍 getCategories запрос:', { parentCode, page, pageSize });
+export const getCategories = async (parentId = null, page = 1, pageSize = 100) => {
+  console.log('🔍 getCategories запрос:', { parentId, page, pageSize });
 
-  const params = { page, page_size: pageSize };
+  const params = new URLSearchParams({
+    page: page.toString(),
+    page_size: pageSize.toString()
+  });
 
-  // ✅ Добавляем параметр parent как в Django
-  if (parentCode === null) {
-    params.parent = 'root';  // Корневые категории
+  // ✅ Фильтруем по parent_id
+  if (parentId !== null && parentId !== undefined) {
+    params.append('parent_id', parentId.toString());
   } else {
-    params.parent = parentCode;  // Подкатегории
+    // Запрос корневых категорий (где parent_id IS NULL)
+    params.append('parent_id', 'null');
   }
 
-  const response = await api.get('/catalog/categories/', { params });
+  try {
+    const response = await api.get(`/catalog/categories/?${params}`);
+    console.log('📦 getCategories RAW ответ:', response.data);
 
-  console.log('📦 getCategories RAW ответ:', response.data);
-  return response.data;
+    if (response.data.results && response.data.results.length > 0) {
+      console.log('🔍 ПЕРВАЯ КАТЕГОРИЯ ИЗ API:', response.data.results[0]);
+      console.log('🔍 ПОЛЯ:', Object.keys(response.data.results[0]));
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error('❌ Ошибка загрузки категорий:', error);
+    throw error;
+  }
 };
 
 /**

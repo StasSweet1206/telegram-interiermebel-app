@@ -81,28 +81,38 @@ const Catalog = () => {
     }
   };
 
-  // Загрузка ПОДКАТЕГОРИЙ по code1c родителя
-  const loadSubcategories = async (parentCode1c) => {
+  // Загрузка ПОДКАТЕГОРИЙ по ID родителя
+  const loadSubcategories = async (parentId) => {
     try {
-      console.log('📂 Загружаем подкатегории для:', parentCode1c);
+      console.log('📂 Загружаем подкатегории для родителя ID:', parentId);
+      setIsLoading(true);
 
-      const response = await getCategories(parentCode1c); // ✅ ИСПРАВЛЕНО
+      // ✅ ИСПРАВЛЕНО: передаём parentId вместо parentCode1c
+      const response = await getCategories(parentId);
       console.log('📦 Получено подкатегорий:', response);
 
-      // ✅ response.data.results - так возвращает getCategories
-      const subcategories = response.results || response;
-      const adaptedSubcategories = subcategories.map(adaptCategory);
+      if (response && response.results) {
+        const adaptedSubcategories = response.results.map(adaptCategory);
 
-      // ✅ ДОБАВЛЯЕМ к существующим, НЕ заменяем!
-      setCategories(prev => [...prev, ...adaptedSubcategories]);
+        // ✅ ДОБАВЛЯЕМ к существующим, НЕ заменяем!
+        // Но проверяем дубликаты по ID
+        setCategories(prev => {
+          const existingIds = new Set(prev.map(cat => cat.id));
+          const newCategories = adaptedSubcategories.filter(cat => !existingIds.has(cat.id));
+          return [...prev, ...newCategories];
+        });
 
-      console.log('✅ Подкатегории загружены:', adaptedSubcategories.length);
+        console.log('✅ Подкатегории загружены:', adaptedSubcategories.length);
+        return adaptedSubcategories;
+      }
 
-      return adaptedSubcategories;
+      return [];
 
     } catch (err) {
       console.error('❌ Ошибка загрузки подкатегорий:', err);
       return [];
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -175,13 +185,14 @@ const Catalog = () => {
       console.log('🔍 Найдена категория:', currentCategory);
 
       if (currentCategory) {
-        // ✅ Проверяем, есть ли УЖЕ ЗАГРУЖЕННЫЕ подкатегории
-        const subcategories = categories.filter(cat => cat.parentId === currentCategory.code1c);
+        // ✅ ИСПРАВЛЕНО: Проверяем подкатегории по parentId (не по code1c!)
+        const subcategories = categories.filter(cat => cat.parentId === currentCategory.id);
         console.log('📁 Найдено подкатегорий в памяти:', subcategories.length);
 
         if (subcategories.length === 0) {
-          console.log('🛒 Загружаем товары для code1c:', currentCategory.code1c);
-          loadCategoryProducts(currentCategory.code1c, 1);
+          // ✅ ИСПРАВЛЕНО: Загружаем товары по ID (не по code1c!)
+          console.log('🛒 Загружаем товары для категории ID:', currentCategory.id);
+          loadCategoryProducts(currentCategory.id, 1);
         } else {
           console.log('✅ Подкатегории есть - НЕ загружаем товары');
         }
@@ -259,15 +270,14 @@ const Catalog = () => {
 
     setCurrentCategoryId(category.id);
 
-    // Сохраняем в путь
+    // ✅ ИСПРАВЛЕНО: Сохраняем путь с ID (code1c убираем или оставляем для совместимости)
     setNavigationPath([...navigationPath, {
       id: category.id,
-      name: category.name,
-      code1c: category.code1c
+      name: category.name
     }]);
 
-    // ✅ ЗАГРУЖАЕМ подкатегории С СЕРВЕРА
-    const subcategories = await loadSubcategories(category.code1c);
+    // ✅ ИСПРАВЛЕНО: ЗАГРУЖАЕМ подкатегории по ID
+    const subcategories = await loadSubcategories(category.id);
 
     if (subcategories.length > 0) {
       // Есть подкатегории - показываем их
@@ -276,45 +286,37 @@ const Catalog = () => {
       setProductsPage(1);
     } else {
       // Нет подкатегорий - загружаем товары
-      console.log('✅ Загружаем товары по code1c:', category.code1c);
-      await loadCategoryProducts(category.code1c, 1);
+      console.log('✅ Загружаем товары для категории ID:', category.id);
+      await loadCategoryProducts(category.id, 1);
     }
   };
 
-  // Навигация назад
+  // Возврат на уровень выше
   const handleBackClick = () => {
-    if (selectedProductId) {
-      setSelectedProductId(null);
-      setSelectedProduct(null);
-      return;
-    }
+    console.log('⬅️ Возврат назад');
 
     if (navigationPath.length > 0) {
-      const newPath = navigationPath.slice(0, -1);
+      const newPath = [...navigationPath];
+      newPath.pop(); // Удаляем последний элемент
       setNavigationPath(newPath);
 
-      if (newPath.length === 0) {
-        // Вернулись к корню
+      if (newPath.length > 0) {
+        // Возвращаемся к предыдущей категории
+        const previousCategory = newPath[newPath.length - 1];
+
+        // ✅ ИСПРАВЛЕНО: используем ID
+        setCurrentCategoryId(previousCategory.id);
+        loadSubcategories(previousCategory.id);
+        loadCategoryProducts(previousCategory.id);
+      } else {
+        // Возвращаемся к корню
         setCurrentCategoryId(null);
         setCurrentProducts([]);
-        setProductsPage(1);
-        // ✅ НЕ ПЕРЕЗАГРУЖАЕМ - корневые УЖЕ в памяти!
-      } else {
-        // Вернулись к предыдущей категории
-        const previousCategory = newPath[newPath.length - 1];
-        setCurrentCategoryId(previousCategory.id);
-
-        // ✅ ПОДКАТЕГОРИИ УЖЕ ЗАГРУЖЕНЫ - просто показываем
-        const subcategories = categories.filter(cat => cat.parentId === previousCategory.code1c);
-
-        if (subcategories.length === 0) {
-          loadCategoryProducts(previousCategory.code1c, 1);
-        } else {
-          setCurrentProducts([]);
-          setProductsPage(1);
-        }
       }
     }
+
+    setSelectedProductId(null);
+    setSelectedProduct(null);
   };
 
   // Навигация по хлебным крошкам
@@ -335,11 +337,12 @@ const Catalog = () => {
       const targetCategory = newPath[newPath.length - 1];
       setCurrentCategoryId(targetCategory.id);
 
-      // ✅ ПОДКАТЕГОРИИ УЖЕ ЗАГРУЖЕНЫ
-      const subcategories = categories.filter(cat => cat.parentId === targetCategory.code1c);
+      // ✅ ИСПРАВЛЕНО: Проверяем подкатегории по ID родителя
+      const subcategories = categories.filter(cat => cat.parentId === targetCategory.id);
 
       if (subcategories.length === 0) {
-        loadCategoryProducts(targetCategory.code1c, 1);
+        // ✅ ИСПРАВЛЕНО: Загружаем товары по ID
+        loadCategoryProducts(targetCategory.id, 1);
       } else {
         setCurrentProducts([]);
         setProductsPage(1);

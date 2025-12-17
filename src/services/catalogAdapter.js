@@ -9,30 +9,42 @@ export const adaptCategory = (category) => {
   console.log('🔄 Адаптация категории:', {
     name: category.name,
     code_1c: category.code_1c,
-    parent_code_1c: category.parent_code_1c
+    parent_code_1c: category.parent_code_1c,
+    parent: category.parent,
+    parent_id: category.parent_id
   });
 
-  // Определяем parentId из parent_code_1c
-  let parentId = null;
-  if (category.parent_code_1c &&
+  // ✅ Сначала пробуем взять parent_id из Django
+  let parentId = category.parent || category.parent_id || category.parentId || null;
+
+  // ✅ Если его нет - пытаемся определить из parent_code_1c (для обратной совместимости)
+  if (!parentId && category.parent_code_1c &&
     category.parent_code_1c !== '00000000-0000-0000-0000-000000000000') {
-    parentId = category.parent_code_1c;
+    // Это для случая если Django не отдаёт parent_id
+    // Но обычно это не сработает, т.к. нам нужен ID, а не code
+    console.warn('⚠️ parent_id не найден, parent_code_1c:', category.parent_code_1c);
   }
 
   const adapted = {
     id: category.id,
     name: category.name,
-    code1c: category.code_1c,           // ← Для поиска подкатегорий
-    parentId: parentId,                 // ← Для определения иерархии
+    code1c: category.code_1c,
+    parentCode1c: category.parent_code_1c,  // ← оставим для совместимости
+    parentId: parentId,                      // ← ОДИН РАЗ!
     imageUrl: category.image || null,
     description: category.description || '',
     productsCount: category.products_count || 0,
   };
 
-  console.log('✅ Адаптированная категория:', adapted);
+  console.log('✅ Адаптированная категория:', {
+    id: adapted.id,
+    name: adapted.name,
+    parentId: adapted.parentId,
+    parentCode1c: adapted.parentCode1c
+  });
+
   return adapted;
 };
-
 /**
  * Преобразование товара Django в формат приложения
  */

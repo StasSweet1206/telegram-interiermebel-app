@@ -20,18 +20,34 @@
   border-radius: 4px;
 }
 
-.breadcrumb-item:hover {
+.breadcrumb-item:hover:not(:disabled) {
   background: var(--tg-theme-secondary-bg-color, rgba(102, 126, 234, 0.1));
 }
 
-.breadcrumb-item:active {
+.breadcrumb-item:active:not(:disabled) {
   transform: scale(0.95);
+}
+
+/* ✅ ДОБАВЛЕНО: Стиль для активной (текущей) крошки */
+.breadcrumb-item.active {
+  color: var(--tg-theme-text-color, #333);
+  font-weight: 600;
+  cursor: default;
+  background: var(--tg-theme-secondary-bg-color, rgba(0, 0, 0, 0.05));
+}
+
+/* ✅ ДОБАВЛЕНО: Стиль для disabled кнопки */
+.breadcrumb-item:disabled {
+  cursor: default;
+  opacity: 0.7;
 }
 
 .breadcrumb-separator {
   color: var(--tg-theme-hint-color, #999);
   margin: 0 4px;
   font-size: 16px;
+  user-select: none;
+  /* ✅ ДОБАВЛЕНО: нельзя выделить текст */
 }
 
 /* Скрываем скроллбар но оставляем прокрутку */
