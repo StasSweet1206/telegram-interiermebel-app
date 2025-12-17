@@ -6,8 +6,7 @@ import ProductDetail from './ProductDetail';
 import Breadcrumbs from './Breadcrumbs';
 import Pagination from './Pagination';
 import {
-  getRootCategories,
-  getSubcategories,
+  getCategories,
   getCategoryProducts,
   getProduct
 } from '../../services/catalog';
@@ -64,10 +63,12 @@ const Catalog = () => {
 
       console.log('📂 Загружаем КОРНЕВЫЕ категории');
 
-      const response = await getRootCategories();
+      const response = await getCategories(null); // ✅ ИСПРАВЛЕНО: null = корневые
       console.log('📦 Получено корневых категорий:', response);
 
-      const adaptedCategories = response.map(adaptCategory);
+      // ✅ response.results - так возвращает getCategories
+      const rootCategories = response.results || response;
+      const adaptedCategories = rootCategories.map(adaptCategory);
       setCategories(adaptedCategories);
 
       console.log('✅ Корневые категории загружены:', adaptedCategories.length);
@@ -85,10 +86,12 @@ const Catalog = () => {
     try {
       console.log('📂 Загружаем подкатегории для:', parentCode1c);
 
-      const response = await getSubcategories(parentCode1c);
+      const response = await getCategories(parentCode1c); // ✅ ИСПРАВЛЕНО
       console.log('📦 Получено подкатегорий:', response);
 
-      const adaptedSubcategories = response.map(adaptCategory);
+      // ✅ response.data.results - так возвращает getCategories
+      const subcategories = response.results || response;
+      const adaptedSubcategories = subcategories.map(adaptCategory);
 
       // ✅ ДОБАВЛЯЕМ к существующим, НЕ заменяем!
       setCategories(prev => [...prev, ...adaptedSubcategories]);
