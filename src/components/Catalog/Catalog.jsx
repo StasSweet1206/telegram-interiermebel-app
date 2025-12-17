@@ -68,6 +68,32 @@ const Catalog = () => {
     stepOrder: product.step_order || 1
   });
 
+  // Загрузка корневых категорий
+  const loadRootCategories = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      console.log('🌳 Загружаем ТОЛЬКО корневые категории');
+
+      const response = await getCategories();
+      const rootCategoriesData = response.results || response;
+
+      console.log('📦 Получено корневых категорий:', rootCategoriesData.length);
+
+      const adaptedCategories = rootCategoriesData.map(adaptCategory);
+      setCategories(adaptedCategories);
+
+      console.log('✅ Корневые категории загружены:', adaptedCategories);
+
+    } catch (err) {
+      console.error('❌ Ошибка загрузки корневых категорий:', err);
+      setError('Не удалось загрузить категории');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // ✅ ИСПРАВЛЕНО: Загрузка подкатегорий
   const loadSubcategories = async (parentId) => {
     try {
