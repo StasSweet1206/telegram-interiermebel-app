@@ -35,11 +35,11 @@ const Catalog = () => {
     id: category.id,
     name: category.name,
     code1c: category.code_1c,
-    parentId: category.parent_code_1c,
+    parentCode1c: category.parent_code_1c,  // ✅ ИСПРАВЛЕНО
     imageUrl: category.image || null,
     description: category.description || '',
     productsCount: category.products_count || 0,
-    hasChildren: category.has_children || false,  // ← НОВОЕ ПОЛЕ!
+    hasChildren: category.has_children || false,
     order: category.order || 0
   });
 
