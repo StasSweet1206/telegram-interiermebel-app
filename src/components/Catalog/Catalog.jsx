@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getCategories, getCategoryProducts, getProduct } from '../services/api'; // ✅ ИСПРАВЛЕНО
-import CategoryCard from '../CategoryCard';
-import ProductCard from '../ProductCard';
-import ProductDetail from '../ProductDetail';
-import Breadcrumbs from '../Breadcrumbs';
-import Pagination from '../Pagination';
+import CategoryCard from './CategoryCard';
+import ProductCard from './ProductCard';
+import ProductDetail from './ProductDetail';
+import Breadcrumbs from './Breadcrumbs';
+import Pagination from './Pagination';
 import './Catalog.css';
 
 const Catalog = () => {
