@@ -103,10 +103,12 @@ const Catalog = () => {
       const response = await getCategories(parentId);
       const subcategoriesData = response.results || response;
 
+      console.log('📦 RAW данные подкатегорий:', subcategoriesData);
       console.log('📦 Получено подкатегорий:', subcategoriesData.length);
 
       const adaptedSubcategories = subcategoriesData.map(adaptCategory);
 
+      console.log('✅ Адаптированные подкатегории:', adaptedSubcategories);
       // ✅ ЗАМЕНЯЕМ категории, а не добавляем
       setCategories(adaptedSubcategories);
 
@@ -264,7 +266,7 @@ const Catalog = () => {
   // ✅ ИСПРАВЛЕНО: Навигация по категории
   const handleCategoryClick = async (category) => {
     console.log('🔍 Клик по категории:', category);
-
+    console.log('📌 code1c категории:', category.code1c);
     setCurrentCategoryId(category.id);
 
     // Сохраняем путь с ID
