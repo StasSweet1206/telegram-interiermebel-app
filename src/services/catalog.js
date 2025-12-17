@@ -13,12 +13,10 @@ export const getCategories = async (parentId = null, page = 1, pageSize = 100) =
     page_size: pageSize
   };
 
-  // ✅ ИСПРАВЛЕНО: Правильная фильтрация
   if (parentId !== null && parentId !== undefined) {
-    params.parent_id = parentId;  // Ищем подкатегории
+    params.parent_id = parentId;
     console.log('📂 Запрос ПОДКАТЕГОРИЙ для parent_id:', parentId);
   } else {
-    // ⚠️ УБРАЛ 'null' - Django сам вернет корневые при отсутствии parent_id
     console.log('🌳 Запрос КОРНЕВЫХ категорий');
   }
 
@@ -28,29 +26,23 @@ export const getCategories = async (parentId = null, page = 1, pageSize = 100) =
 
     if (response.data.results && response.data.results.length > 0) {
       console.log('🔍 ПЕРВАЯ КАТЕГОРИЯ ИЗ API:', response.data.results[0]);
-      console.log('🔍 ПОЛЯ:', Object.keys(response.data.results[0]));
-
-      // ✅ ДОБАВЛЕНО: Проверка parent у всех категорий
-      console.log('🔎 ПРОВЕРКА parent у всех категорий:');
-      response.data.results.forEach(cat => {
-        console.log(`  ID: ${cat.id}, NAME: ${cat.name}, PARENT: ${cat.parent || 'null'}`);
-      });
     }
 
-    // ✅ ДОБАВЛЕНО: Адаптация категорий
+    // ✅ Адаптация категорий
     const adaptedCategories = response.data.results.map(adaptCategory);
     console.log('✅ Адаптировано категорий:', adaptedCategories.length);
 
     if (adaptedCategories.length > 0) {
-      console.log('📋 Первая адаптированная:', {
-        id: adaptedCategories[0].id,
-        name: adaptedCategories[0].name,
-        parentId: adaptedCategories[0].parentId,
-        hasChildren: adaptedCategories[0].hasChildren
-      });
+      console.log('📋 Первая адаптированная:', adaptedCategories[0]);
     }
 
-    return adaptedCategories;  // ✅ Возвращаем адаптированные данные!
+    // ✅ ИСПРАВЛЕНО: Возвращаем объект с полями!
+    return {
+      categories: adaptedCategories,  // массив категорий
+      count: response.data.count,     // общее количество
+      next: response.data.next,       // ссылка на следующую страницу
+      previous: response.data.previous // ссылка на предыдущую страницу
+    };
   } catch (error) {
     console.error('❌ Ошибка загрузки категорий:', error);
     throw error;

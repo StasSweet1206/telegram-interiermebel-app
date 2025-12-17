@@ -69,59 +69,44 @@ const Catalog = () => {
   });
 
   // Загрузка корневых категорий
-  const loadRootCategories = async () => {
+  const loadRootCategories = useCallback(async () => {
+    console.log('🌳 Загружаем корневые категории');
+    setIsLoading(true);
+
     try {
-      setLoading(true);
-      setError(null);
+      const data = await getCategories(null, 1, 100);
 
-      console.log('🌳 Загружаем ТОЛЬКО корневые категории');
+      console.log('✅ Получено корневых категорий:', data.categories.length);
+      console.log('📋 Первая категория:', data.categories[0]);
 
-      const response = await getCategories();
-      const rootCategoriesData = response.results || response;
-
-      console.log('📦 Получено корневых категорий:', rootCategoriesData.length);
-
-      const adaptedCategories = rootCategoriesData.map(adaptCategory);
-      setCategories(adaptedCategories);
-
-      console.log('✅ Корневые категории загружены:', adaptedCategories);
-
-    } catch (err) {
-      console.error('❌ Ошибка загрузки корневых категорий:', err);
-      setError('Не удалось загрузить категории');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // ✅ ИСПРАВЛЕНО: Загрузка подкатегорий
-  const loadSubcategories = async (parentId) => {
-    try {
-      setIsLoading(true);
-      console.log('📂 Загружаем подкатегории для родителя ID:', parentId);
-
-      const response = await getCategories(parentId);
-      const subcategoriesData = response.results || response;
-
-      console.log('📦 RAW данные подкатегорий:', subcategoriesData);
-      console.log('📦 Получено подкатегорий:', subcategoriesData.length);
-
-      const adaptedSubcategories = subcategoriesData.map(adaptCategory);
-
-      console.log('✅ Адаптированные подкатегории:', adaptedSubcategories);
-      // ✅ ЗАМЕНЯЕМ категории, а не добавляем
-      setCategories(adaptedSubcategories);
-
-      console.log('✅ Подкатегории загружены и ЗАМЕНИЛИ предыдущие');
-      return adaptedSubcategories;
-
-    } catch (err) {
-      console.error('❌ Ошибка загрузки подкатегорий:', err);
-      return [];
+      setCategories(data.categories);  // ✅ Берем из data.categories
+    } catch (error) {
+      console.error('❌ Ошибка загрузки корневых категорий:', error);
+      setError(error.message);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  // ✅ ИСПРАВЛЕНО: Загрузка подкатегорий
+  const loadSubcategories = useCallback(async (parentId) => {
+    console.log('📂 Загружаем подкатегории для родителя ID:', parentId);
+    setIsLoading(true);
+
+    try {
+      const data = await getCategories(parentId, 1, 100);
+
+      console.log('✅ Получено подкатегорий:', data.categories.length);
+
+      setCategories(data.categories);  // ✅ Берем из data.categories
+    } catch (error) {
+      console.error('❌ Ошибка загрузки подкатегорий:', error);
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   // Загрузка товаров категории
   const loadCategoryProducts = async (categoryCode, page = 1) => {
     try {
