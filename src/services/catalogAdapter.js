@@ -6,7 +6,7 @@
  * Преобразование категории Django в формат приложения
  */
 export const adaptCategory = (category) => {
-  console.log('🔧 RAW категория с бэкенда:', cat);
+  console.log('🔧 RAW категория с бэкенда:', category);
   console.log('🔄 Адаптация категории:', {
     name: category.name,
     code_1c: category.code_1c,
