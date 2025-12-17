@@ -25,6 +25,7 @@ const Catalog = () => {
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Пагинация только для товаров
   const [productsPage, setProductsPage] = useState(1);
