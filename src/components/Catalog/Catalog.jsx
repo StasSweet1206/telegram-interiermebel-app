@@ -82,39 +82,78 @@ const Catalog = () => {
     }
   };
 
-  // Загрузка ПОДКАТЕГОРИЙ по ID родителя
-  const loadSubcategories = async (parentId) => {
-    try {
-      console.log('📂 Загружаем подкатегории для родителя ID:', parentId);
-      setIsLoading(true);
+  const showCategoryContent = async () => {
+    console.log('🎯 === showCategoryContent START ===');
+    console.log('Состояние:');
+    console.log('  - selectedProductId:', selectedProductId);
+    console.log('  - selectedProduct:', selectedProduct);
+    console.log('  - currentCategoryId:', currentCategoryId);
+    console.log('  - currentProducts.length:', currentProducts.length);
+    console.log('  - categories.length:', categories.length);
 
-      // ✅ ИСПРАВЛЕНО: передаём parentId вместо parentCode1c
-      const response = await getCategories(parentId);
-      console.log('📦 Получено подкатегорий:', response);
-
-      if (response && response.results) {
-        const adaptedSubcategories = response.results.map(adaptCategory);
-
-        // ✅ ДОБАВЛЯЕМ к существующим, НЕ заменяем!
-        // Но проверяем дубликаты по ID
-        setCategories(prev => {
-          const existingIds = new Set(prev.map(cat => cat.id));
-          const newCategories = adaptedSubcategories.filter(cat => !existingIds.has(cat.id));
-          return [...prev, ...newCategories];
-        });
-
-        console.log('✅ Подкатегории загружены:', adaptedSubcategories.length);
-        return adaptedSubcategories;
-      }
-
-      return [];
-
-    } catch (err) {
-      console.error('❌ Ошибка загрузки подкатегорий:', err);
-      return [];
-    } finally {
-      setIsLoading(false);
+    if (selectedProductId && selectedProduct) {
+      console.log('📦 Показываем карточку товара');
+      return <ProductCard product={selectedProduct} onBack={handleBackFromProduct} />;
     }
+
+    if (!currentCategoryId) {
+      console.log('⚠️ Нет текущей категории - показываем корень');
+      return showRootCategories();
+    }
+
+    const currentCategory = categories.find(cat => cat.id === currentCategoryId);
+    console.log('🔍 Текущая категория:', currentCategory);
+
+    if (!currentCategory) {
+      console.log('❌ Категория не найдена в памяти');
+      return <div className="catalog-loading">Загрузка...</div>;
+    }
+
+    // ✅ ИСПРАВЛЕНО: ищем подкатегории по parentId
+    const subcategories = categories.filter(
+      cat => cat.parentId === currentCategoryId
+    );
+
+    console.log('📁 Найдено подкатегорий в памяти:', subcategories.length);
+
+    if (subcategories.length === 0 && currentCategory.hasChildren) {
+      console.log('⚠️ Подкатегории должны быть, но не загружены - загружаем');
+      loadSubcategories(currentCategoryId);
+    }
+
+    if (subcategories.length === 0) {
+      console.log('⚠️ Подкатегорий нет - конечная категория');
+    }
+
+    console.log('🔍 ВСЕ категории:', categories);
+    console.log('🔍 Первая категория:', categories[0]);
+
+    // ✅ Показываем товары ТОЛЬКО если нет подкатегорий
+    if (subcategories.length === 0) {
+      return (
+        <>
+          {currentProducts.length > 0 && (
+            <ProductGrid
+              products={currentProducts}
+              onProductClick={handleProductClick}
+            />
+          )}
+          {isLoading && <div className="catalog-loading">Загрузка товаров...</div>}
+          {!isLoading && currentProducts.length === 0 && (
+            <div className="catalog-empty">Товары не найдены</div>
+          )}
+        </>
+      );
+    }
+
+    // ✅ Показываем подкатегории
+    return (
+      <CategoryGrid
+        categories={subcategories}
+        onCategoryClick={handleCategoryClick}
+        isLoading={isLoading}
+      />
+    );
   };
 
   // Загрузка товаров категории
