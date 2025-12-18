@@ -109,22 +109,58 @@ export const getProducts = async (filters = {}) => {
   console.log('🔍 getProducts запрос:', filters);
 
   try {
+    // ✅ ИСПРАВЛЕНО: Формируем правильные параметры
+    const params = {
+      page: filters.page || 1,
+      page_size: filters.page_size || 20,
+    };
+
+    // ✅ ИСПРАВЛЕНО: Используем category_id вместо category
+    if (filters.category_id) {
+      params.category_id = filters.category_id;
+    }
+
+    // Добавляем поиск если есть
+    if (filters.search) {
+      params.search = filters.search;
+    }
+
+    // Добавляем фильтры по цене если есть
+    if (filters.min_price) {
+      params.min_price = filters.min_price;
+    }
+
+    if (filters.max_price) {
+      params.max_price = filters.max_price;
+    }
+
+    console.log('📤 Финальные параметры запроса:', params);
+
     const response = await api.get('/catalog/products/', {
-      params: filters,
+      params: params, // ✅ ИСПРАВЛЕНО: используем сформированные параметры
     });
 
-    console.log('📦 getProducts ответ:', response.data);
+    console.log('📦 getProducts RAW ответ:', response.data);
 
-    // ✅ ДОБАВЛЕНО: Адаптация
+    // ✅ Адаптация товаров
     const adaptedProducts = response.data.results.map(adaptProduct);
+
+    console.log('✅ Адаптировано товаров:', adaptedProducts.length);
+
+    if (adaptedProducts.length > 0) {
+      console.log('📋 Первый товар:', adaptedProducts[0]);
+    }
 
     return {
       products: adaptedProducts,
-      totalCount: response.data.count,
+      total: response.data.count, // ✅ ИСПРАВЛЕНО: total вместо totalCount
+      currentPage: filters.page || 1,
+      totalPages: Math.ceil(response.data.count / (filters.page_size || 20)),
       hasMore: !!response.data.next
     };
   } catch (error) {
     console.error('❌ Ошибка загрузки товаров:', error);
+    console.error('📋 Детали ошибки:', error.response?.data);
     throw error;
   }
 };

@@ -138,37 +138,34 @@ const Catalog = () => {
   };
 
   // Загрузка товаров категории
-  const loadProducts = useCallback(async (categoryCode) => {
-    console.log('🛒 Загружаем товары для категории:', categoryCode);
-
-    if (!categoryCode) {
-      console.warn('⚠️ categoryCode пустой, пропускаем загрузку');
-      setCurrentProducts([]);
-      return;
-    }
+  const loadProducts = useCallback(async (categoryCode1c, categoryId) => {
+    console.log('🛒 Загружаем товары для категории:', categoryCode1c);
+    console.log('🆔 ID категории:', categoryId);
 
     setIsLoading(true);
+    setCurrentProducts([]);
 
     try {
-      // ✅ Передаем объект с фильтрами
       const filters = {
-        category: categoryCode,  // Или category_code, проверьте что принимает бэкенд
+        category_id: categoryId, // ✅ ИСПРАВЛЕНО: используем ID вместо code_1c
         page: 1,
         page_size: 20
       };
 
       console.log('📤 Фильтры для загрузки товаров:', filters);
 
-      const data = await getProducts(filters);
+      const data = await catalogService.getProducts(filters);
 
       console.log('✅ Получено товаров:', data.products.length);
-
       setCurrentProducts(data.products);
+
+      return data.products;
     } catch (error) {
       console.error('❌ Ошибка загрузки товаров:', error);
-      console.error('📋 Детали ошибки:', error.response?.data);
+      console.log('📋 Детали ошибки:', error.response?.data);
       setError(error.message);
       setCurrentProducts([]);
+      return [];
     } finally {
       setIsLoading(false);
     }
@@ -273,6 +270,14 @@ const Catalog = () => {
     setCurrentCategoryId(category.id);
     setSelectedProductId(null);
     setSelectedProduct(null);
+    setCurrentProducts([]); // ✅ ДОБАВЛЕНО: очищаем товары
+
+    // Добавляем в хлебные крошки
+    setBreadcrumbs(prev => [...prev, {
+      id: category.id,
+      name: category.name,
+      code1c: category.code1c
+    }]);
 
     // Сначала пробуем загрузить подкатегории
     console.log('📂 Загружаем подкатегории для категории ID:', category.id);
@@ -281,12 +286,12 @@ const Catalog = () => {
     // Если подкатегорий нет - загружаем товары
     if (!subcategories || subcategories.length === 0) {
       console.log('📦 Подкатегорий нет, загружаем товары');
-      console.log('🔑 Используем code1c:', category.code1c);
+      console.log('🔑 Используем ID:', category.id); // ✅ ИСПРАВЛЕНО: используем ID
 
-      if (category.code1c) {
-        await loadProducts(category.code1c);  // ✅ ИЗМЕНЕНО
+      if (category.id) {
+        await loadProducts(category.code1c, category.id); // ✅ ИСПРАВЛЕНО: передаем оба параметра
       } else {
-        console.error('❌ У категории нет code1c!');
+        console.error('❌ У категории нет ID!');
       }
     } else {
       console.log('📁 Показываем подкатегории:', subcategories.length);
