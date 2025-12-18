@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getCategories, getCategoryProducts, getProduct, getProducts } from '../../services/catalog';
+import { getCategories, getCategoryProducts, getProduct, getProducts, catalogService } from '../../services/catalog';
 import CategoryCard from './CategoryCard';
 import ProductCard from './ProductCard';
 import ProductDetail from './ProductDetail';
@@ -15,7 +15,7 @@ const Catalog = () => {
   const [categories, setCategories] = useState([]);
   const [currentCategoryId, setCurrentCategoryId] = useState(null);
   const [navigationPath, setNavigationPath] = useState([]);
-
+  const [breadcrumbs, setBreadcrumbs] = useState([]);
   // Состояние товаров
   const [currentProducts, setCurrentProducts] = useState([]);
   const [productsPage, setProductsPage] = useState(1);
