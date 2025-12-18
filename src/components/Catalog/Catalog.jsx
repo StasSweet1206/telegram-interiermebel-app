@@ -234,8 +234,6 @@ const Catalog = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentCategoryId, currentProducts.length]); // ✅ БЕЗ categories
-
-  // ✅ ИСПРАВЛЕНО: Определение текущих данных для отображения
   const getCurrentData = () => {
     console.log('🎯 getCurrentData вызван');
     console.log('📊 Состояние:');
@@ -245,47 +243,21 @@ const Catalog = () => {
     console.log('  - currentProducts.length:', currentProducts.length);
     console.log('  - categories.length:', categories.length);
 
-    // 1. Если выбран товар
+    // 1️⃣ Если выбран конкретный товар - показываем его детали
     if (selectedProductId && selectedProduct) {
-      console.log('✅ Возвращаем ТОВАР');
+      console.log('✅ Показываем ДЕТАЛИ ТОВАРА:', selectedProduct.name);
       return { type: 'product', data: selectedProduct };
     }
 
-    // 2. Если есть категория И товары загружены
-    if (currentCategoryId && currentProducts.length > 0) {
-      console.log('✅ Возвращаем ТОВАРЫ, количество:', currentProducts.length);
+    // 2️⃣ Если есть товары - показываем список товаров
+    if (currentProducts.length > 0) {
+      console.log('✅ Показываем СПИСОК ТОВАРОВ:', currentProducts.length);
       return { type: 'products', data: currentProducts };
     }
 
-    // 3. Если есть категория - показываем подкатегории
-    if (currentCategoryId) {
-      const currentCategory = categories.find(cat => cat.id === currentCategoryId);
-      console.log('🔍 Текущая категория:', currentCategory);
-
-      if (!currentCategory) {
-        console.log('❌ Категория не найдена - показываем корень');
-        const rootCategories = categories.filter(cat => !cat.parentId);
-        return { type: 'categories', data: rootCategories };
-      }
-
-      // ✅ ИСПРАВЛЕНО: Ищем подкатегории по parentId
-      const subcategories = categories.filter(cat => cat.parentId === currentCategory.id);
-
-      console.log('📁 Найдено подкатегорий в памяти:', subcategories.length);
-
-      if (subcategories.length > 0) {
-        console.log('✅ Возвращаем ПОДКАТЕГОРИИ');
-        return { type: 'categories', data: subcategories };
-      }
-    }
-
-    // 4. ✅ ИСПРАВЛЕНО: Корневые категории фильтруются по parentId
-    console.log('🔍 ВСЕ категории:', categories);
-    const rootCategories = categories.filter(cat => !cat.parentId);
-
-    console.log('✅ Возвращаем КОРНЕВЫЕ категории:', rootCategories.length);
-
-    return { type: 'categories', data: rootCategories };
+    // 3️⃣ В остальных случаях показываем категории
+    console.log('✅ Показываем КАТЕГОРИИ:', categories.length);
+    return { type: 'categories', data: categories };
   };
 
   const handleCategoryClick = async (category) => {
