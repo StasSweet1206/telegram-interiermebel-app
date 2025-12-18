@@ -154,7 +154,7 @@ const Catalog = () => {
 
       console.log('📤 Фильтры для загрузки товаров:', filters);
 
-      const data = await catalogService.getProducts(filters);
+      const data = await getProducts(filters);
 
       console.log('✅ Получено товаров:', data.products.length);
       setCurrentProducts(data.products);
