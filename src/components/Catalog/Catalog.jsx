@@ -98,13 +98,17 @@ const Catalog = () => {
 
       console.log('✅ Получено подкатегорий:', data.categories.length);
 
-      setCategories(data.categories);
+      // ✅ ИСПРАВЛЕНИЕ: НЕ сбрасываем categories, если подкатегорий нет
+      if (data.categories.length > 0) {
+        setCategories(data.categories);
+      }
+      // Если подкатегорий нет, categories остаются прежними (не сбрасываются)
 
-      return data.categories;  // ✅ ДОБАВЛЕНО: возвращаем категории
+      return data.categories;
     } catch (error) {
       console.error('❌ Ошибка загрузки подкатегорий:', error);
       setError(error.message);
-      return [];  // ✅ ДОБАВЛЕНО: при ошибке возвращаем пустой массив
+      return [];
     } finally {
       setIsLoading(false);
     }
