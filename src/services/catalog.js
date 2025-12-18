@@ -69,37 +69,45 @@ export const getCategory = async (id) => {
 };
 
 /**
- * Получить товары категории (по code_1c)
- * @param {string} categoryCode - code_1c категории
+ * Получить товары категории (по ID)
+ * @param {number} categoryId - ID категории (не code_1c!)
  */
-export const getCategoryProducts = async (categoryCode, page = 1, pageSize = 20) => {
-  console.log('🔍 getCategoryProducts запрос:', { categoryCode, page, pageSize });
+export const getCategoryProducts = async (categoryId, page = 1, pageSize = 20) => {
+  console.log('🔍 getCategoryProducts запрос:', { categoryId, page, pageSize });
 
   try {
     const response = await api.get('/catalog/products/', {
       params: {
-        category: categoryCode,  // ✅ Фильтр по code_1c
+        category_id: categoryId,  // ✅ Используем category_id вместо category
         page,
         page_size: pageSize
       },
     });
 
     console.log('📦 getCategoryProducts RAW ответ:', response.data);
-    console.log('  - Товаров получено:', response.data.results?.length || 0);
-    console.log('  - Всего товаров:', response.data.count);
-
-    // ✅ ДОБАВЛЕНО: Адаптация товаров
-    const adaptedProducts = response.data.results.map(adaptProduct);
-
-    return {
-      products: adaptedProducts,
-      totalCount: response.data.count,
-      hasMore: !!response.data.next
-    };
+    return adaptProductsResponse(response.data);
   } catch (error) {
     console.error('❌ Ошибка загрузки товаров категории:', error);
     throw error;
   }
+};
+
+console.log('📦 getCategoryProducts RAW ответ:', response.data);
+console.log('  - Товаров получено:', response.data.results?.length || 0);
+console.log('  - Всего товаров:', response.data.count);
+
+// ✅ ДОБАВЛЕНО: Адаптация товаров
+const adaptedProducts = response.data.results.map(adaptProduct);
+
+return {
+  products: adaptedProducts,
+  totalCount: response.data.count,
+  hasMore: !!response.data.next
+};
+  } catch (error) {
+  console.error('❌ Ошибка загрузки товаров категории:', error);
+  throw error;
+}
 };
 
 /**
