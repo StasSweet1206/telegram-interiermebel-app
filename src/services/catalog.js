@@ -70,7 +70,7 @@ export const getCategory = async (id) => {
 
 /**
  * Получить товары категории (по ID)
- * @param {number} categoryId - ID категории (не code_1c!)
+ * @param {number} categoryId - ID категории
  */
 export const getCategoryProducts = async (categoryId, page = 1, pageSize = 20) => {
   console.log('🔍 getCategoryProducts запрос:', { categoryId, page, pageSize });
@@ -78,38 +78,29 @@ export const getCategoryProducts = async (categoryId, page = 1, pageSize = 20) =
   try {
     const response = await api.get('/catalog/products/', {
       params: {
-        category_id: categoryId,  // ✅ Используем category_id вместо category
+        category_id: categoryId,  // ✅ Используем category_id (числовой ID)
         page,
         page_size: pageSize
       },
     });
 
     console.log('📦 getCategoryProducts RAW ответ:', response.data);
-    return adaptProductsResponse(response.data);
+    console.log('  - Товаров получено:', response.data.results?.length || 0);
+    console.log('  - Всего товаров:', response.data.count);
+
+    // ✅ Адаптация товаров
+    const adaptedProducts = response.data.results.map(adaptProduct);
+
+    return {
+      products: adaptedProducts,
+      totalCount: response.data.count,
+      hasMore: !!response.data.next
+    };
   } catch (error) {
     console.error('❌ Ошибка загрузки товаров категории:', error);
     throw error;
   }
 };
-
-console.log('📦 getCategoryProducts RAW ответ:', response.data);
-console.log('  - Товаров получено:', response.data.results?.length || 0);
-console.log('  - Всего товаров:', response.data.count);
-
-// ✅ ДОБАВЛЕНО: Адаптация товаров
-const adaptedProducts = response.data.results.map(adaptProduct);
-
-return {
-  products: adaptedProducts,
-  totalCount: response.data.count,
-  hasMore: !!response.data.next
-};
-  } catch (error) {
-  console.error('❌ Ошибка загрузки товаров категории:', error);
-  throw error;
-}
-};
-
 /**
  * Получить список товаров с фильтрами
  */
