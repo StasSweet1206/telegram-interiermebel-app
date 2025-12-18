@@ -120,7 +120,7 @@ const ProductDetail = ({ product, onBack, onAddToCart, cartItems }) => {
         {/* Цена и остаток */}
         <div className="product-detail-info">
           <div className="product-detail-price">
-            {currentPrice.toLocaleString('ru-RU')} ₽
+            {(currentPrice || 0).toLocaleString('ru-RU')} ₽
           </div>
 
           <div className={`product-detail-stock ${availableStock === 0 ? 'out-of-stock' : ''}`}>
@@ -141,7 +141,7 @@ const ProductDetail = ({ product, onBack, onAddToCart, cartItems }) => {
         {availableStock > 0 && (
           <div className="product-detail-actions">
             <div className="quantity-selector">
-              <button 
+              <button
                 className="quantity-button"
                 onClick={() => handleQuantityChange(-1)}
                 disabled={quantity <= 1}
@@ -149,7 +149,7 @@ const ProductDetail = ({ product, onBack, onAddToCart, cartItems }) => {
                 −
               </button>
               <span className="quantity-value">{quantity}</span>
-              <button 
+              <button
                 className="quantity-button"
                 onClick={() => handleQuantityChange(1)}
                 disabled={quantity >= availableStock}
@@ -158,7 +158,7 @@ const ProductDetail = ({ product, onBack, onAddToCart, cartItems }) => {
               </button>
             </div>
 
-            <button 
+            <button
               className="add-to-cart-button"
               onClick={handleAddToCart}
             >

@@ -61,22 +61,25 @@ export const adaptProduct = (product) => {
     code1c: product.code_1c,
     categoryId: product.category,
     categoryName: product.category_name,
-    basePrice: parseFloat(product.price),
+
+    // ✅ ИСПРАВЛЕНО: безопасная обработка цены
+    basePrice: product.price ? parseFloat(product.price) : 0,
     oldPrice: product.old_price ? parseFloat(product.old_price) : null,
-    discount: product.discount_percentage,
-    description: product.description,
+    discount: product.discount_percentage || 0,
+
+    description: product.description || '',
     image: product.main_image,
     images: product.images || [],
-    stock: product.stock,
-    inStock: product.stock > 0,
-    isNew: product.is_new,
-    isBestseller: product.is_bestseller,
-    isSale: product.is_sale,
-    rating: parseFloat(product.rating),
-    reviewsCount: product.reviews_count,
-    unit: product.unit,
-    article: product.article,
-    barcode: product.barcode,
+    stock: product.stock || 0,
+    inStock: (product.stock || 0) > 0,
+    isNew: product.is_new || false,
+    isBestseller: product.is_bestseller || false,
+    isSale: product.is_sale || false,
+    rating: product.rating ? parseFloat(product.rating) : 0,
+    reviewsCount: product.reviews_count || 0,
+    unit: product.unit || 'шт',
+    article: product.article || '',
+    barcode: product.barcode || '',
 
     // Характеристики товара
     hasCharacteristics: product.characteristics && product.characteristics.length > 0,
@@ -84,8 +87,8 @@ export const adaptProduct = (product) => {
       id: char.id,
       name: char.characteristic_name,
       value: char.value,
-      price: parseFloat(product.price),
-      stock: product.stock,
+      price: product.price ? parseFloat(product.price) : 0,  // ✅ ИСПРАВЛЕНО
+      stock: product.stock || 0,
       image: null
     })) || []
   };
