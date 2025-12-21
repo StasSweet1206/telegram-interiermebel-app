@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getCategories, getCategoryProducts, getProduct, getProducts } from '../../services/catalog';
+import CatalogHeader from './CatalogHeader';
 import CategoryCard from './CategoryCard';
 import ProductCard from './ProductCard';
 import ProductDetail from './ProductDetail';
@@ -434,15 +435,26 @@ const Catalog = () => {
 
   return (
     <div className="catalog">
-      {/* Хлебные крошки и кнопка домой */}
-      {!selectedProductId && (
-        <div className="catalog-header">
-          <Breadcrumbs path={navigationPath} onNavigate={handleBreadcrumbClick} />
-          <button className="home-button" onClick={handleGoHome}>
-            🏠 Главное меню
-          </button>
-        </div>
-      )}
+      <CatalogHeader
+        currentView={type}
+        selectedCategory={currentCategoryId ? categories.find(c => c.id === currentCategoryId) : null}
+        selectedProduct={selectedProduct}
+        onBack={(action) => {
+          if (action === 'menu') {
+            handleGoHome();
+          } else if (action === 'root') {
+            setNavigationPath([]);
+            setCurrentCategoryId(null);
+            setCurrentProducts([]);
+            setProductsPage(1);
+            setSelectedProductId(null);
+            setSelectedProduct(null);
+            loadRootCategories();
+          } else if (action === 'category') {
+            handleBackFromProduct();
+          }
+        }}
+      />
 
       {/* Детальная страница товара */}
       {type === 'product' && (

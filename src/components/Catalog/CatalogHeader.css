@@ -1,0 +1,165 @@
+/* ========== ШАПКА КАТАЛОГА ========== */
+.catalog-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    padding: 16px;
+    box-shadow: 0 4px 12px rgba(250, 112, 154, 0.3);
+    transition: all 0.3s ease;
+}
+
+/* ========== КНОПКА НАЗАД ========== */
+.catalog-back-button {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    transition: all 0.2s;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.catalog-back-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateX(-4px);
+}
+
+.catalog-back-button:active {
+    transform: translateX(-2px) scale(0.98);
+    background: rgba(255, 255, 255, 0.25);
+}
+
+/* ========== КОНТЕНТ ШАПКИ ========== */
+.catalog-header-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    animation: slideInFromLeft 0.3s ease;
+}
+
+@keyframes slideInFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.catalog-header-icon {
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    backdrop-filter: blur(10px);
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.catalog-header-icon:hover {
+    transform: scale(1.05) rotate(5deg);
+}
+
+.catalog-header-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.catalog-header-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0;
+    color: white;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.catalog-header-subtitle {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 4px 0 0 0;
+    font-weight: 500;
+}
+
+/* ========== АДАПТИВНОСТЬ ========== */
+@media (max-width: 480px) {
+    .catalog-header {
+        padding: 12px;
+    }
+
+    .catalog-back-button {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+
+    .catalog-header-icon {
+        width: 50px;
+        height: 50px;
+    }
+
+    .catalog-header-icon svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    .catalog-header-title {
+        font-size: 22px;
+    }
+
+    .catalog-header-subtitle {
+        font-size: 12px;
+    }
+}
+
+@media (min-width: 768px) {
+    .catalog-header {
+        padding: 24px;
+    }
+
+    .catalog-back-button {
+        padding: 12px 20px;
+        font-size: 15px;
+    }
+
+    .catalog-header-icon {
+        width: 70px;
+        height: 70px;
+    }
+
+    .catalog-header-icon svg {
+        width: 36px;
+        height: 36px;
+    }
+
+    .catalog-header-title {
+        font-size: 32px;
+    }
+
+    .catalog-header-subtitle {
+        font-size: 16px;
+    }
+}
+
+/* ========== ПЛАВНЫЕ ПЕРЕХОДЫ ========== */
+.catalog-header * {
+    transition: all 0.3s ease;
+}
