@@ -437,7 +437,7 @@ const Catalog = () => {
     <div className="catalog">
       <CatalogHeader
         currentView={type}
-        selectedCategory={currentCategoryId ? categories.find(c => c.id === currentCategoryId) : null}
+        selectedCategory={navigationPath[navigationPath.length - 1] || null}
         selectedProduct={selectedProduct}
         onBack={(action) => {
           if (action === 'menu') {
@@ -455,6 +455,7 @@ const Catalog = () => {
           }
         }}
       />
+
 
       {/* Детальная страница товара */}
       {type === 'product' && (
