@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // В Create React App используется process.env, а не import.meta.env
-const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://positively-nationwide-akita.cloudpub.ru/rashitova_mebelen1';
+const BASE_URL = '/api/proxy';
 const USERNAME = process.env.REACT_APP_API_USERNAME;
 const PASSWORD = process.env.REACT_APP_API_PASSWORD;
 
