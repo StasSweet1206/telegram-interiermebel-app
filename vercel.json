@@ -1,13 +1,13 @@
 {
+  "version": 2,
   "buildCommand": "npm run build",
   "outputDirectory": "build",
-  "redirects": [
-    {
-      "source": "/api/:path*",
-      "destination": "https://sso-production-4c05.up.railway.app/api/:path*",
-      "permanent": false
+  "functions": {
+    "api/**/*.js": {
+      "memory": 1024,
+      "maxDuration": 10
     }
-  ],
+  },
   "rewrites": [
     {
       "source": "/(.*)",
