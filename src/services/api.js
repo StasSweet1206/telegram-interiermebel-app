@@ -1,78 +1,70 @@
 import axios from 'axios';
 
-// Базовый URL вашего Django бэкенда на Railway
-// Для Vite используем import.meta.env вместо process.env
-//const API_URL = import.meta.env.VITE_API_URL || 'https://sso-production-4c05.up.railway.app/api';
-//const API_URL = process.env.REACT_APP_API_URL || 'https://sso-production-4c05.up.railway.app/api';
-//const API_URL = process.env.REACT_APP_API_URL || '/api';
-const API_URL = process.env.REACT_APP_API_URL || 'https://sso-production-4c05.up.railway.app/api';
+// В Create React App используется process.env, а не import.meta.env
+const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://positively-nationwide-akita.cloudpub.ru/rashitova_mebelen1';
+const USERNAME = process.env.REACT_APP_API_USERNAME;
+const PASSWORD = process.env.REACT_APP_API_PASSWORD;
 
-// Создаем axios instance
-const api = axios.create({
-  baseURL: API_URL,
-  timeout: 30000,
+console.log('🔐 API Configuration:', {
+  baseURL: BASE_URL,
+  hasUsername: !!USERNAME,
+  hasPassword: !!PASSWORD,
+});
+
+// Создаем базовую конфигурацию
+const config = {
+  baseURL: BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-});
+  timeout: 10000,
+};
 
-// Request interceptor
-api.interceptors.request.use(
-  (config) => {
-    console.log('🚀 Request:', config.method?.toUpperCase(), config.url);
+// Добавляем авторизацию только если есть логин И пароль
+if (USERNAME && PASSWORD) {
+  config.auth = {
+    username: USERNAME,
+    password: PASSWORD
+  };
+  console.log('✅ Авторизация добавлена');
+} else {
+  console.warn('⚠️ Работаем без авторизации');
+}
 
-    // Добавляем Telegram данные в заголовки
-    if (window.Telegram?.WebApp?.initData) {
-      config.headers['X-Telegram-Init-Data'] = window.Telegram.WebApp.initData;
-    }
+// Создаем экземпляр axios
+const api = axios.create(config);
 
-    return config;
-  },
-  (error) => {
-    console.error('❌ Request Error:', error);
-    return Promise.reject(error);
+// Функция получения категорий
+export const getCategories = async () => {
+  try {
+    const response = await api.get('/hs/catalog/categories/');
+    return response.data;
+  } catch (error) {
+    console.error('❌ Ошибка при получении категорий:', error);
+    throw error;
   }
-);
+};
 
-// Response interceptor
-api.interceptors.response.use(
-  (response) => {
-    console.log('✅ Response:', response.status, response.config.url);
-    console.log('📦 Response data:', response.data);
-
-    // ⚠️ ВАЖНО: Возвращаем полный response, а не response.data
-    // Потому что в catalogAdapter мы обращаемся к response.data
-    return response;
-  },
-  (error) => {
-    console.error('❌ Response Error:', error.response?.status, error.message);
-
-    if (error.response) {
-      const status = error.response.status;
-
-      switch (status) {
-        case 401:
-          console.error('Unauthorized - требуется авторизация');
-          break;
-        case 403:
-          console.error('Forbidden - доступ запрещен');
-          break;
-        case 404:
-          console.error('Not Found - ресурс не найден');
-          break;
-        case 500:
-          console.error('Server Error - ошибка сервера');
-          break;
-      }
-    } else if (error.request) {
-      console.error('No response from server');
-      console.error('Возможно проблема с CORS или сервер недоступен');
-    } else {
-      console.error('Error:', error.message);
-    }
-
-    return Promise.reject(error);
+// Функция получения товаров категории
+export const getCategoryProducts = async (categoryId) => {
+  try {
+    const response = await api.get(`/hs/catalog/products/${categoryId}`);
+    return response.data;
+  } catch (error) {
+    console.error('❌ Ошибка при получении товаров категории:', error);
+    throw error;
   }
-);
+};
+
+// Функция получения товара по ID
+export const getProductById = async (productId) => {
+  try {
+    const response = await api.get(`/hs/catalog/product/${productId}`);
+    return response.data;
+  } catch (error) {
+    console.error('❌ Ошибка при получении товара:', error);
+    throw error;
+  }
+};
 
 export default api;

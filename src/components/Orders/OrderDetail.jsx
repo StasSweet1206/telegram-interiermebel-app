@@ -32,7 +32,7 @@ const OrderDetail = ({ order, onBack }) => {
   return (
     <div className="order-detail">
       {/* Статус заказа */}
-      <div 
+      <div
         className="order-detail-status-card"
         style={{ background: getStatusGradient(order.status) }}
       >
@@ -175,9 +175,9 @@ const OrderDetail = ({ order, onBack }) => {
       </div>
 
       {/* Скрытое поле с ID документа */}
-      <input 
-        type="hidden" 
-        name="orderId" 
+      <input
+        type="hidden"
+        name="orderId"
         value={order.id}
         data-order-id={order.id}
       />

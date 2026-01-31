@@ -1,158 +1,74 @@
-/**
- * Адаптер для преобразования данных Django API в формат приложения
- */
-
-/**
- * Преобразование категории Django в формат приложения
- */
-export const adaptCategory = (category) => {
-  console.log('🔧 RAW категория с бэкенда:', category);
-  console.log('🔄 Адаптация категории:', {
-    name: category.name,
-    code_1c: category.code_1c,
-    parent_code_1c: category.parent_code_1c,
-    parent: category.parent,
-    parent_id: category.parent_id
-  });
-
-  // ✅ ИСПРАВЛЕНО: Правильная обработка parentId
-  let parentId = null;
-
-  // Проверяем все возможные варианты
-  if (category.parent !== undefined && category.parent !== null) {
-    parentId = category.parent;
-  } else if (category.parent_id !== undefined && category.parent_id !== null) {
-    parentId = category.parent_id;
-  } else if (category.parentId !== undefined && category.parentId !== null) {
-    parentId = category.parentId;
+// Адаптер для категорий из 1С
+export const adaptCategoriesData = (data) => {
+  if (!Array.isArray(data)) {
+    console.error('Неверный формат данных категорий:', data);
+    return [];
   }
 
-  const adapted = {
-    id: category.id,
-    name: category.name,
-    code1c: category.code_1c,
-    parentCode1c: category.parent_code_1c,
-    parentId: category.parent_id,
-    imageUrl: category.image || null,
-    description: category.description || '',
-    productsCount: category.products_count || 0,
-    hasChildren: category.has_children || false,  // ✅ ДОБАВЛЕНО!
-  };
-
-  console.log('✅ Адаптированная категория:', {
-    id: adapted.id,
-    name: adapted.name,
-    parentId: adapted.parentId,
-    hasChildren: adapted.hasChildren,
-    parentCode1c: adapted.parentCode1c
-  });
-
-  return adapted;
+  return data
+    .filter(item => item.is_active) // только активные категории
+    .sort((a, b) => a.order - b.order) // сортируем по order
+    .map(item => ({
+      id: item.code_1c,
+      name: item.name.replace(/^"|"$/g, ''), // убираем кавычки в начале и конце
+      description: item.description.replace(/^"|"$/g, ''),
+      parentId: item.parent_id,
+      isActive: item.is_active,
+      order: item.order
+    }));
 };
 
-/**
- * Преобразование товара Django в формат приложения
- */
-export const adaptProduct = (product) => {
-  return {
-    id: product.id,
-    name: product.name,
-    slug: product.slug,
-    code1c: product.code_1c,
-    categoryId: product.category,
-    categoryName: product.category_name,
+// Адаптер для товаров категории
+export const adaptProductsData = (data) => {
+  if (!Array.isArray(data)) {
+    console.error('Неверный формат данных товаров:', data);
+    return [];
+  }
 
-    // ✅ ИСПРАВЛЕНО: безопасная обработка цены
-    basePrice: product.price ? parseFloat(product.price) : 0,
-    oldPrice: product.old_price ? parseFloat(product.old_price) : null,
-    discount: product.discount_percentage || 0,
-
-    description: product.description || '',
-    image: product.main_image,
-    images: product.images || [],
-    stock: product.stock || 0,
-    inStock: (product.stock || 0) > 0,
-    isNew: product.is_new || false,
-    isBestseller: product.is_bestseller || false,
-    isSale: product.is_sale || false,
-    rating: product.rating ? parseFloat(product.rating) : 0,
-    reviewsCount: product.reviews_count || 0,
-    unit: product.unit || 'шт',
-    article: product.article || '',
-    barcode: product.barcode || '',
-
-    // Характеристики товара
-    hasCharacteristics: product.characteristics && product.characteristics.length > 0,
-    characteristics: product.characteristics?.map(char => ({
-      id: char.id,
-      name: char.characteristic_name,
-      value: char.value,
-      price: product.price ? parseFloat(product.price) : 0,  // ✅ ИСПРАВЛЕНО
-      stock: product.stock || 0,
-      image: null
-    })) || []
-  };
+  return data.map(item => ({
+    id: item.code_1c,
+    name: item.name,
+    fullName: item.full_name,
+    categoryId: item.category_id,
+    image: item.image_url || '/placeholder.jpg',
+    hasVariants: item.has_variants,
+    variants: item.has_variants ? adaptVariantsData(item.variants) : []
+  }));
 };
 
-/**
- * Построение дерева категорий из плоского списка
- */
-export const buildCategoryTree = (categories) => {
-  const categoryMap = {};
-  const rootCategories = [];
+// Адаптер для вариантов товара (характеристик)
+export const adaptVariantsData = (variants) => {
+  if (!Array.isArray(variants)) {
+    return [];
+  }
 
-  // Создаем карту категорий
-  categories.forEach(cat => {
-    categoryMap[cat.id] = adaptCategory(cat);
-  });
+  return variants.map(variant => ({
+    id: variant.code_1c,
+    name: variant.name,
+    fullName: variant.full_name,
+    categoryId: variant.category_id,
+    image: variant.image_url || '/placeholder.jpg'
+  }));
+};
 
-  // Строим дерево
-  categories.forEach(cat => {
-    const adapted = categoryMap[cat.id];
-
-    if (cat.parent === null) {
-      // Корневая категория
-      rootCategories.push(adapted);
-    } else {
-      // Добавляем в подкатегории родителя
-      const parent = categoryMap[cat.parent];
-      if (parent) {
-        if (!parent.subcategories) {
-          parent.subcategories = [];
-        }
-        parent.subcategories.push(adapted);
-      }
-    }
-  });
+// Адаптер для одного товара
+export const adaptProductData = (data) => {
+  if (!data) {
+    console.error('Нет данных товара');
+    return null;
+  }
 
   return {
-    categories: rootCategories,
-    categoryMap
+    id: data.code_1c,
+    name: data.name,
+    fullName: data.full_name,
+    categoryId: data.category_id,
+    image: data.image_url || '/placeholder.jpg',
+    hasVariants: data.has_variants,
+    variants: data.has_variants ? adaptVariantsData(data.variants) : [],
+    // Дополнительные поля, если они есть в вашем API
+    price: data.price || 0,
+    description: data.description || data.full_name || '',
+    inStock: data.in_stock !== false
   };
-};
-
-/**
- * Преобразование списка товаров
- */
-export const adaptProducts = (products) => {
-  return products.map(adaptProduct);
-};
-
-/**
- * Группировка товаров по категориям
- */
-export const groupProductsByCategory = (products) => {
-  const grouped = {};
-
-  products.forEach(product => {
-    const categoryId = product.categoryId;
-
-    if (!grouped[categoryId]) {
-      grouped[categoryId] = [];
-    }
-
-    grouped[categoryId].push(product);
-  });
-
-  return grouped;
 };
