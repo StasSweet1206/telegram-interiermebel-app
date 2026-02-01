@@ -37,7 +37,7 @@ const api = axios.create(config);
 // Функция получения категорий
 export const getCategories = async () => {
   try {
-    const response = await api.get('/hs/catalog/categories/');
+    const response = await api.get('?path=/hs/catalog/categories/');
     return response.data;
   } catch (error) {
     console.error('❌ Ошибка при получении категорий:', error);
@@ -48,7 +48,7 @@ export const getCategories = async () => {
 // Функция получения товаров категории
 export const getCategoryProducts = async (categoryId) => {
   try {
-    const response = await api.get(`/hs/catalog/products/${categoryId}`);
+    const response = await api.get(`?path=/hs/catalog/products/${categoryId}`);
     return response.data;
   } catch (error) {
     console.error('❌ Ошибка при получении товаров категории:', error);
@@ -59,12 +59,10 @@ export const getCategoryProducts = async (categoryId) => {
 // Функция получения товара по ID
 export const getProductById = async (productId) => {
   try {
-    const response = await api.get(`/hs/catalog/product/${productId}`);
+    const response = await api.get(`?path=/hs/catalog/product/${productId}`);
     return response.data;
   } catch (error) {
     console.error('❌ Ошибка при получении товара:', error);
     throw error;
   }
 };
-
-export default api;
